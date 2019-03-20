@@ -9,7 +9,6 @@ import datetime  # write date and time to output
 import time
 import winsound
 
-
 DEBUG = False
 legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
            "wraith", "bangalore", "caustic", "mirage"]
@@ -138,7 +137,8 @@ def init_output_file(filepath="output/Apex Stats.txt", delim="\t"):
         with open(filepath, "w+") as file:
             file.write("Initialized on: " + datetime.datetime.now().strftime("%d/%b/%Y, %H:%M:%S") + "\n")
             file.write(
-                "Season" + delim + "Group-Size" + delim + "Time Survived" + delim + "Legend" + delim + "Damage" + delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")
+                "Season" + delim + "Group-Size" + delim + "Time Survived" + delim + "Legend" + delim + "Damage" +
+                delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")
     return
 
 
@@ -175,12 +175,15 @@ def check_data(values):
 
 def clean_data(val):
     """ manual cleaning of potentially incorrectly recognized values """
-    result = val.replace("o", "0").replace("d", "0").replace("l", "1").replace(",", "").replace("/", "7")
-    return result
+    val = val.replace("o", "0")
+    val = val.replace("d", "0")
+    val = val.replace("l", "1")
+    val = val.replace(",", "")
+    val = val.replace("/", "7")
+    return val
 
 
 def main():
-
     print("Waiting for input...")
     print("Press Alt + K to take a screenshot of your match summary.")
 
