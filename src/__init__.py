@@ -49,7 +49,7 @@ def main():
               "\n###########################"
               "\n")
 
-        legends = ['bloodhound', "gibraltar", "lifeline", "pathfinder", "octane",
+        legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
                    "wraith", "bangalore", "caustic", "mirage"]
 
         won_match = False
