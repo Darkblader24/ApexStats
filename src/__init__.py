@@ -7,7 +7,7 @@ from PIL import Image
 import keyboard
 
 
-use_actual_screenshot = False
+DEBUG = True
 legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
            "wraith", "bangalore", "caustic", "mirage"]
 
@@ -50,9 +50,41 @@ def find_regex(expression, text):
     return None
 
 
+def is_close_match(s1, s2, tolerance=1, allow_different_length=True):
+    """ returns whether or not two strings only differ by the number of tolerated characters """
+    if s1 == s2:
+        return True
+    if not allow_different_length and len(s1) != len(s2):
+        return False
+
+    exhausted = abs(len(s1) - len(s2))
+    for i in range(0, min(len(s1), len(s2))):
+        if s1[i] != s2[i]:
+            exhausted += 1
+        if exhausted > tolerance:
+            return False
+
+    return exhausted <= tolerance
+
+
+def close_match_in(string, text, tolerance=1):
+    """ returns whether or not a string is found as a close match within a text """
+    if string in text:
+        return True
+    if len(string) >= len(text):
+        return is_close_match(string, text, tolerance=tolerance)
+
+    for i in range(0, len(text) - len(string)):
+        if is_close_match(string, text[i:i + len(string)]):
+            return True
+
+    return False
+
+
 def main():
+
     while True:
-        if use_actual_screenshot:
+        if not DEBUG:
             # Check for input
             while True:
                 # Quit
@@ -111,12 +143,15 @@ def main():
 
         legend = None
         for legend_name in legends:
-            if legend_name in text_ocr:
+            if close_match_in(legend_name, text_ocr):
                 legend = legend_name
                 break
+            # if legend_name in text_ocr:
+            #     legend = legend_name
+            #     break
         print("legend:", legend)
 
-        if not use_actual_screenshot:
+        if DEBUG:
             return
 
 
