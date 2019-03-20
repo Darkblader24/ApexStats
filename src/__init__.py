@@ -7,6 +7,11 @@ from PIL import Image
 import keyboard
 
 
+use_actual_screenshot = False
+legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
+           "wraith", "bangalore", "caustic", "mirage"]
+
+
 def check_quit():
     return keyboard.is_pressed("alt") and keyboard.is_pressed("q")
 
@@ -47,65 +52,62 @@ def find_regex(expression, text):
 
 def main():
     while True:
-        if check_quit():
-            return
+        if use_actual_screenshot:
+            # Check for input
+            while True:
+                # Quit
+                if check_quit():
+                    return
+                # Make screenshot
+                if keyboard.is_pressed("alt") and keyboard.is_pressed("k"):
+                    break
 
-        while True:
-            if check_quit():
-                return
-            if keyboard.is_pressed("alt") and keyboard.is_pressed("k"):
-                break
+            # Make a screenshot of the selected monitor
+            img = make_screenshot(monitor_id=1)
 
-        # Make a screenshot of the selected monitor
-        # img = make_screenshot(monitor_id=1)
-
-        # Remove noise from screenshot
-        # cln_img = clean_image(img)
-        cln_img = clean_image(Image.open("data/apex_screenshot_test_half.png"))
+            # Remove noise from screenshot
+            cln_img = clean_image(img)
+        else:
+            # Use test screenshot
+            cln_img = clean_image(Image.open("data/apex_screenshot_test_half.png"))
 
         # Save screenshot and denoised image
         # img.save("data/apex_screenshot.png")
         cln_img.save("data/apex_stats_clean.png")
 
         # Detect text from denoised screenshot
-        text_ocr = pytesseract.image_to_string(cln_img).lower()
+        text_ocr = pytesseract.image_to_string(cln_img).lower().replace("\n\n", "\n")
         print(text_ocr)
+        print("---------------------------------------------------------")
 
         # Handle text data
         if "xp breakdown" not in text_ocr:
             print("No Apex Match Summary found!")
             continue
 
-        print("\n"
-              "\n"
-              "\n###########################"
-              "\n###### MATCH SUMMARY ######"
-              "\n###########################"
-              "\n")
+        season = find_regex(r"[\n\r].*season *([^\n\r]*)", text_ocr)
+        print("Season:", season)
 
-        legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
-                   "wraith", "bangalore", "caustic", "mirage"]
-
-        time_survived = find_regex(r"[\n\r].*time survived [(\[]*([^\n\r)\]]*)", text_ocr)
-        print("time survived:", time_survived)
+        placement = find_regex(r"[\n\r].*# *([^\n\r.]*)", text_ocr)
+        print("Placement:", placement)
 
         kills = find_regex(r"[\n\r].*kills [(\[]x*([^\n\r)\]]*)", text_ocr)
-        print("kills:", kills)
+        print("Kills:", kills)
+
+        time_survived = find_regex(r"[\n\r].*time survived [(\[]*([^\n\r)\]]*)", text_ocr)
+        print("Time Survived:", time_survived)
 
         damage_done = find_regex(r"[\n\r].*damage done [(\[]*([^\n\r)\]]*)", text_ocr)
-        print("damage done:", damage_done)
+        print("Damage done:", damage_done)
 
         revives = find_regex(r"[\n\r].*revive ally [(\[]x*([^\n\r)\]]*)", text_ocr)
-        print("revives:", revives)
+        print("Revives:", revives)
 
         respawns = find_regex(r"[\n\r].*respawn ally [(\[]x*([^\n\r)\]]*)", text_ocr)
-        print("respawns:", respawns)
+        print("Respawns:", respawns)
 
-        solo = find_regex(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)
-        print("solo:", solo)
-
-        placement = find_regex(r"[\n\r].*#*([^\n\r]*)", text_ocr)
-        print("place:", placement)
+        group_size = find_regex(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)
+        print("Group Size:", group_size)
 
         legend = None
         for legend_name in legends:
@@ -113,6 +115,9 @@ def main():
                 legend = legend_name
                 break
         print("legend:", legend)
+
+        if not use_actual_screenshot:
+            return
 
 
 if __name__ == "__main__":
