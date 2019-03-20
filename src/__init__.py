@@ -119,7 +119,7 @@ def init_output_file(filepath="output/Apex Stats.txt", delim="\t"):
         with open(filepath, "w+") as file:
             file.write("Initialized on: " + datetime.datetime.now().strftime("%d/%b/%Y, %H:%M:%S") + "\n")
             file.write(
-                "Season" + delim + "Group-Size" + delim + "Legend" + delim + "Damage" + delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")
+                "Season" + delim + "Group-Size" + delim + "Time Survived" + delim + "Legend" + delim + "Damage" + delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")
     return
 
 
@@ -137,7 +137,8 @@ def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
     return
 
 
-def check_data(values, ignore_legend_index=2):
+# TODO: do not use manual index for legend name values
+def check_data(values, ignore_legend_index=3):
     all_digits = True
 
     for i in range(0, len(values)):
@@ -180,7 +181,7 @@ def main():
 
 
             # Take a screenshot of the selected monitor
-            img = make_screenshot(monitor_id=3)
+            img = make_screenshot(monitor_id=1)
 
             # Remove noise from screenshot
             cln_img = clean_image(img)
@@ -250,7 +251,7 @@ def main():
         print("Legend:", legend.capitalize())
 
         # order is determined by init_output_file
-        data = [season, group_size, legend, damage_done, kills, revives, respawns, placement]
+        data = [season, group_size, time_survived, legend, damage_done, kills, revives, respawns, placement]
 
         # Check data for incorrect values, like None or non-digit values. Ignores the index value of the legend name
         data_correct = check_data(data, ignore_legend_index=2)
