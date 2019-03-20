@@ -6,6 +6,7 @@ from PIL import Image
 
 import keyboard  # check button presses
 import datetime  # write date and time to output
+import time
 
 
 DEBUG = False
@@ -48,7 +49,7 @@ def find_regex(expression, text):
     result = None
     regex = re.findall(expression, text)
     if regex:
-        result = regex[-1].replace("d", "0").replace("o", "0").replace("O", "0")
+        result = clean_data(regex[-1])
     return result
 
 
@@ -105,10 +106,10 @@ def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
     return
 
 
-def clean_data(values):
+def clean_data(val):
     """ manual cleaning of potentially incorrectly recognized values """
-    # Season should be a number
-    return
+    result = val.replace("o", "0").replace("d", "0").replace(",", "")
+    return result
 
 
 def main():
@@ -124,6 +125,8 @@ def main():
                 # Take screenshot
                 if keyboard.is_pressed("alt") and keyboard.is_pressed("k"):
                     break
+                time.sleep(0.01)
+
 
             # Take a screenshot of the selected monitor
             img = make_screenshot(monitor_id=1)
@@ -149,30 +152,43 @@ def main():
             continue
 
         # See example: https://rubular.com/r/A4j1odfYdw7TWZ
-        season = find_regex(r"[\n\r].*season *([^\n\r]*)", text_ocr)
+        # select all characters after "season" that until we match newline, carriage return, space or p (season is followed by " played x mins ago")
+        season = find_regex(r"[\n\r].*season *([^\n\r p]*)", text_ocr)
         print("Season:", season)
 
-        placement = find_regex(r"[\n\r].*# *([^\n\r.]*)", text_ocr)
+        # match until newline, carriage return, comma, full-stop or space
+        placement = find_regex(r"[\n\r].*# *([^\n\r., ]*)", text_ocr)
+        if int(placement) > 20:
+            placement = placement[:-2]
         print("Placement:", placement)
 
+        # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
+
+        # match until newline, carriage return, parenthesis or square bracket
         kills = find_regex(r"[\n\r].*kills [(\[]x*([^\n\r)\]]*)", text_ocr)
         print("Kills:", kills)
 
+        # see above
         time_survived = find_regex(r"[\n\r].*time survived [(\[]*([^\n\r)\]]*)", text_ocr)
         print("Time Survived:", time_survived)
 
+        # match damage done or damage cone
         damage_done = find_regex(r"[\n\r].*damage [dc]one [(\[]*([^\n\r)\]]*)", text_ocr)
         print("Damage Done:", damage_done)
 
+        # see above
         revives = find_regex(r"[\n\r].*revive ally [(\[]x*([^\n\r)\]]*)", text_ocr)
         print("Revives:", revives)
 
+        # see above
         respawns = find_regex(r"[\n\r].*respawn ally [(\[]x*([^\n\r)\]]*)", text_ocr)
         print("Respawns:", respawns)
 
-        group_size = find_regex(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)
+        # see above
+        group_size = str(int(find_regex(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)) + 1)
         print("Group Size:", group_size)
 
+        # legend names are selected from a set list (with some tolerance)
         legend = None
         for legend_name in legends:
             if close_match_in(legend_name, text_ocr):
@@ -183,7 +199,6 @@ def main():
         # order is determined by init_output_file
         data = [season, group_size, legend, damage_done, kills, revives, respawns, placement]
 
-        clean_data(data)
         append_to_output(data)
 
         if DEBUG:
