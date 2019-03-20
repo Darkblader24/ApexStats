@@ -43,6 +43,7 @@ cmake-build-*/
 
 # IntelliJ
 out/
+.idea
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -66,3 +67,4 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 src/data/apex_screenshot.png
+src/data/apex_stats_clean.png
