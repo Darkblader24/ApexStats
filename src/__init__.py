@@ -4,96 +4,113 @@ import mss
 import mss.tools
 from PIL import Image
 
+import keyboard
+
+
+def check_quit():
+    return keyboard.is_pressed("alt") and keyboard.is_pressed("q")
+
 
 def main():
-    # Make a screenshot of the selected monitor
-    # img = make_screenshot(monitor_id=2)
 
-    # Remove noise from screenshot
-    # cln_img = clean_image(img)
-    cln_img = clean_image(Image.open("data/apex_screenshot_test_half.png"))
+    while True:
+        if check_quit():
+            return
 
-    # Save screenshot and denoised image
-    # img.save("data/apex_screenshot.png")
-    cln_img.save("data/apex_stats_clean.png")
+        while True:
+            if check_quit():
+                return
+            if keyboard.is_pressed("alt") and keyboard.is_pressed("k"):
+                break
 
-    # Detect text from denoised screenshot
-    text_ocr = pytesseract.image_to_string(cln_img).lower()
-    print(text_ocr)
+        # Make a screenshot of the selected monitor
+        img = make_screenshot(monitor_id=1)
 
-    # Handle text data
-    if "xp breakdown" not in text_ocr:
-        print("No Apex Match Summary found!")
-        return
+        # Remove noise from screenshot
+        cln_img = clean_image(img)
+        # cln_img = clean_image(Image.open("data/apex_screenshot_test_half.png"))
 
-    print("\n"
-          "\n"
-          "\n###########################"
-          "\n###### MATCH SUMMARY ######"
-          "\n###########################"
-          "\n")
+        # Save screenshot and denoised image
+        # img.save("data/apex_screenshot.png")
+        cln_img.save("data/apex_stats_clean.png")
 
-    won_match = False
-    time_survived = ""
-    kills = 0
-    damage_done = 0
-    revives = 0
-    respawns = 0
-    solo = 0
-    legend = "Bang Galore"
+        # Detect text from denoised screenshot
+        text_ocr = pytesseract.image_to_string(cln_img).lower()
+        print(text_ocr)
 
-    if "won match" in text_ocr:
-        won_match = True
-    print("match won:", won_match)
+        # Handle text data
+        if "xp breakdown" not in text_ocr:
+            print("No Apex Match Summary found!")
+            continue
 
-    regex = re.findall(r"[\n\r].*time survived [(\[]*([^\n\r)\]]*)", text_ocr)
-    if regex:
-        time_survived = regex[0]
-    else:
-        print("following not found:")
-    print("time survived:", time_survived)
+        print("\n"
+              "\n"
+              "\n###########################"
+              "\n###### MATCH SUMMARY ######"
+              "\n###########################"
+              "\n")
 
-    regex = re.findall(r"[\n\r].*kills [(\[]x*([^\n\r)\]]*)", text_ocr)
-    if regex:
-        kills = regex[0]
-    else:
-        print("following not found:")
-    print("kills:", kills)
+        won_match = False
+        time_survived = ""
+        kills = 0
+        damage_done = 0
+        revives = 0
+        respawns = 0
+        solo = 0
+        legend = "Bang Galore"
 
-    regex = re.findall(r"[\n\r].*damage done [(\[]*([^\n\r)\]]*)", text_ocr)
-    if regex:
-        damage_done = regex[0]
-    else:
-        print("following not found:")
-    print("damage done:", damage_done)
+        if "won match" in text_ocr:
+            won_match = True
+        print("match won:", won_match)
 
-    regex = re.findall(r"[\n\r].*revive ally [(\[]x*([^\n\r)\]]*)", text_ocr)
-    if regex:
-        revives = regex[0]
-    else:
-        print("following not found:")
-    print("revives:", revives)
+        regex = re.findall(r"[\n\r].*time survived [(\[]*([^\n\r)\]]*)", text_ocr)
+        if regex:
+            time_survived = regex[0]
+        else:
+            print("following not found:")
+        print("time survived:", time_survived)
 
-    regex = re.findall(r"[\n\r].*respawn ally [(\[]x*([^\n\r)\]]*)", text_ocr)
-    if regex:
-        respawns = regex[0]
-    else:
-        print("following not found:")
-    print("respawns:", respawns)
+        regex = re.findall(r"[\n\r].*kills [(\[]x*([^\n\r)\]]*)", text_ocr)
+        if regex:
+            kills = regex[0]
+        else:
+            print("following not found:")
+        print("kills:", kills)
 
-    regex = re.findall(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)
-    if regex:
-        solo = regex[0]
-    else:
-        print("following not found:")
-    print("solo:", solo)
+        regex = re.findall(r"[\n\r].*damage done [(\[]*([^\n\r)\]]*)", text_ocr)
+        if regex:
+            damage_done = regex[0]
+        else:
+            print("following not found:")
+        print("damage done:", damage_done)
 
-    regex = re.findall(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)
-    if regex:
-        legend = regex[0]
-    else:
-        print("following not found:")
-    print("legend:", legend)
+        regex = re.findall(r"[\n\r].*revive ally [(\[]x*([^\n\r)\]]*)", text_ocr)
+        if regex:
+            revives = regex[0]
+        else:
+            print("following not found:")
+        print("revives:", revives)
+
+        regex = re.findall(r"[\n\r].*respawn ally [(\[]x*([^\n\r)\]]*)", text_ocr)
+        if regex:
+            respawns = regex[0]
+        else:
+            print("following not found:")
+        print("respawns:", respawns)
+
+        regex = re.findall(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)
+        if regex:
+            solo = regex[0]
+        else:
+            print("following not found:")
+        print("solo:", solo)
+
+        regex = re.findall(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)
+        if regex:
+            legend = regex[0]
+        else:
+            print("following not found:")
+        print("legend:", legend)
 
 
 def clean_image(img):
