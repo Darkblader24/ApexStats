@@ -197,7 +197,6 @@ def main():
                     break
                 time.sleep(0.01)
 
-
             # Take a screenshot of the selected monitor
             img = make_screenshot(monitor_id=1)
 
@@ -237,27 +236,27 @@ def main():
         # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
 
         # match until newline, carriage return, parenthesis or square bracket
-        kills = find_regex(r"[\n\r].*kills [(\[]x*([^\n\r)\]]*)", text_ocr)
+        kills = find_regex(r"[\n\r].*kills [(\[]x*([^\n\r)\]}]*)", text_ocr)
         print("Kills:", kills)
 
         # see above
-        time_survived = find_regex(r"[\n\r].*time survived [(\[]*([^\n\r)\]]*)", text_ocr)
+        time_survived = find_regex(r"[\n\r].*time survived [(\[]*([^\n\r)\]}]*)", text_ocr)
         print("Time Survived:", time_survived)
 
         # match damage done or damage cone
-        damage_done = find_regex(r"[\n\r].*damage [dc]one [(\[]*([^\n\r)\]]*)", text_ocr)
+        damage_done = find_regex(r"[\n\r].*damage [dcu]one [(\[]*([^\n\r)\]}]*)", text_ocr)
         print("Damage Done:", damage_done)
 
         # see above
-        revives = find_regex(r"[\n\r].*revive ally [(\[]x*([^\n\r)\]]*)", text_ocr)
+        revives = find_regex(r"[\n\r].*revive ally [(\[]x*([^\n\r)\]}]*)", text_ocr)
         print("Revives:", revives)
 
         # see above
-        respawns = find_regex(r"[\n\r].*respawn ally [(\[]x*([^\n\r)\]]*)", text_ocr)
+        respawns = find_regex(r"[\n\r].*respawn ally [(\[]x*([^\n\r)\]}]*)", text_ocr)
         print("Respawns:", respawns)
 
         # see above
-        group_size = str(int(find_regex(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)) + 1)
+        group_size = str(int(find_regex(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]}]*)", text_ocr)) + 1)
         print("Group Size:", group_size)
 
         # legend names are selected from a set list (with some tolerance)
