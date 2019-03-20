@@ -44,10 +44,11 @@ def make_screenshot(monitor_id):
 
 
 def find_regex(expression, text):
+    result = None
     regex = re.findall(expression, text)
     if regex:
-        return regex[0]
-    return None
+        result = regex[-1].replace("d", "0").replace("o", "0").replace("O", "0")
+    return result
 
 
 def is_close_match(s1, s2, tolerance=1, allow_different_length=True):
@@ -104,7 +105,7 @@ def main():
             cln_img = clean_image(Image.open("data/apex_screenshot_test_half.png"))
 
         # Save screenshot and denoised image
-        # img.save("data/apex_screenshot.png")
+        img.save("data/apex_screenshot.png")
         cln_img.save("data/apex_stats_clean.png")
 
         # Detect text from denoised screenshot
@@ -117,6 +118,7 @@ def main():
             print("No Apex Match Summary found!")
             continue
 
+        # See example: https://rubular.com/r/A4j1odfYdw7TWZ
         season = find_regex(r"[\n\r].*season *([^\n\r]*)", text_ocr)
         print("Season:", season)
 
@@ -129,8 +131,8 @@ def main():
         time_survived = find_regex(r"[\n\r].*time survived [(\[]*([^\n\r)\]]*)", text_ocr)
         print("Time Survived:", time_survived)
 
-        damage_done = find_regex(r"[\n\r].*damage done [(\[]*([^\n\r)\]]*)", text_ocr)
-        print("Damage done:", damage_done)
+        damage_done = find_regex(r"[\n\r].*damage [dc]one [(\[]*([^\n\r)\]]*)", text_ocr)
+        print("Damage Done:", damage_done)
 
         revives = find_regex(r"[\n\r].*revive ally [(\[]x*([^\n\r)\]]*)", text_ocr)
         print("Revives:", revives)
@@ -149,7 +151,7 @@ def main():
             # if legend_name in text_ocr:
             #     legend = legend_name
             #     break
-        print("legend:", legend)
+        print("Legend:", legend.capitalize())
 
         if DEBUG:
             return
