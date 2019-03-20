@@ -86,14 +86,14 @@ def main():
         solo = regex[0]
     else:
         print('following not found:')
-    print('respawns:', solo)
+    print('solo:', solo)
 
     regex = re.findall('[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)', text_ocr)
     if regex:
-        solo = regex[0]
+        legend = regex[0]
     else:
         print('following not found:')
-    print('respawns:', solo)
+    print('legend:', legend)
 
 
 
