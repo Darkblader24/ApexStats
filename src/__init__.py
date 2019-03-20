@@ -33,6 +33,9 @@ def main():
           "\n###########################"
           "\n")
 
+    legends = ['bloodhound', "gibraltar", "lifeline", "pathfinder", "octane",
+               "wraith", "bangalore", "caustic", "mirage"]
+
     won_match = False
     time_survived = ""
     kills = 0
@@ -40,7 +43,7 @@ def main():
     revives = 0
     respawns = 0
     solo = 0
-    legend = "Bang Galore"
+    legend = None
 
     if "won match" in text_ocr:
         won_match = True
@@ -88,12 +91,13 @@ def main():
         print("following not found:")
     print("solo:", solo)
 
-    regex = re.findall(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]]*)", text_ocr)
-    if regex:
-        legend = regex[0]
-    else:
-        print("following not found:")
+    for legend_name in legends:
+        if legend_name in text_ocr:
+            legend = legend_name
+            break
     print("legend:", legend)
+
+
 
 
 def clean_image(img):
