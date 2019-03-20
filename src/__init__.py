@@ -23,11 +23,11 @@ def main():
                 break
 
         # Make a screenshot of the selected monitor
-        img = make_screenshot(monitor_id=1)
+        # img = make_screenshot(monitor_id=1)
 
         # Remove noise from screenshot
-        cln_img = clean_image(img)
-        # cln_img = clean_image(Image.open("data/apex_screenshot_test_half.png"))
+        # cln_img = clean_image(img)
+        cln_img = clean_image(Image.open("data/apex_screenshot_test_half.png"))
 
         # Save screenshot and denoised image
         # img.save("data/apex_screenshot.png")
@@ -60,6 +60,7 @@ def main():
         respawns = 0
         solo = 0
         legend = None
+        place = 0
 
         if "won match" in text_ocr:
             won_match = True
@@ -106,6 +107,13 @@ def main():
         else:
             print("following not found:")
         print("solo:", solo)
+
+        regex = re.findall(r"[\n\r].*#*([^\n\r]*)", text_ocr)
+        if regex:
+            place = regex[0]
+        else:
+            print("following not found:")
+        print("place:", place)
 
         for legend_name in legends:
             if legend_name in text_ocr:
