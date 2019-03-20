@@ -138,6 +138,9 @@ def clean_data(val):
 
 def main():
 
+    print("Waiting for input...")
+    print("Press Alt + K to take a screenshot of your match summary.")
+
     init_output_file()
 
     while True:
