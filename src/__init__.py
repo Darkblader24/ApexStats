@@ -164,12 +164,10 @@ def check_data(values):
         if not value:
             all_digits = False
             print_error("INVALID VALUE:", value)
-            # print("INVALID VALUE:", value)
 
-        elif value not in legends and not value.replace(":", "").isdigit():
+        elif value.lower() not in legends and not value.replace(":", "").isdigit():
             all_digits = False
             print_error("INVALID VALUE:", value)
-            # print("INVALID VALUE:", value)
 
     return all_digits
 
@@ -265,9 +263,9 @@ def main():
         legend = None
         for legend_name in legends:
             if close_match_in(legend_name, text_ocr):
-                legend = legend_name
+                legend = legend_name.capitalize()
                 break
-        print("Legend:", legend.capitalize())
+        print("Legend:", legend)
 
         # order is determined by init_output_file
         data = [season, group_size, time_survived, legend, damage_done, kills, revives, respawns, placement]
