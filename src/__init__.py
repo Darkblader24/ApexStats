@@ -59,7 +59,7 @@ def play_success_sound():
 
 
 def play_failure_sound():
-    # winsound.PlaySound("sounds/failed.wav", winsound.SND_FILENAME)
+    # winsound.PlaySound("sounds/invalid_value.wav", winsound.SND_FILENAME)
     winsound.MessageBeep(winsound.MB_OK)
     return
 
@@ -69,8 +69,8 @@ def play_screenshot_sound():
     return
 
 
-def play_success_but_failure_sound():
-    winsound.PlaySound("sounds/failed.wav", winsound.SND_FILENAME)
+def play_invalid_value_sound():
+    winsound.PlaySound("sounds/invalid_value.wav", winsound.SND_FILENAME)
     return
 
 
@@ -180,16 +180,18 @@ def clean_data(val):
     val = val.replace("l", "1")
     val = val.replace(",", "")
     val = val.replace("/", "7")
+    val = val.replace("t", "7")
     return val
 
 
 def main():
-    print("Waiting for input...")
-    print("Press Alt + K to take a screenshot of your match summary.")
-
     init_output_file()
 
     while True:
+
+        print("Waiting for input...")
+        print("Press Alt + K to take a screenshot of your match summary.")
+
         if not DEBUG:
             # Check for input
             while True:
@@ -207,11 +209,8 @@ def main():
             cln_img = clean_image(img)
         else:
             # Use test screenshot
+            img = Image.open("input/apex_screenshot.png")
             cln_img = clean_image(Image.open("input/apex_screenshot_test_half.png"))
-
-        # Save screenshot and denoised image
-        # img.save("input/apex_screenshot.png")
-        cln_img.save("input/apex_stats_clean.png")
 
         # Detect text from denoised screenshot
         text_ocr = pytesseract.image_to_string(cln_img).lower().replace("\n\n", "\n")
@@ -226,7 +225,8 @@ def main():
             continue
 
         # See example: https://rubular.com/r/A4j1odfYdw7TWZ
-        # select all characters after "season" that until we match newline, carriage return, space or p (season is followed by " played x mins ago")
+        # select all characters after "season" that until we match newline, carriage return, space or p
+        # (season is followed by " played x mins ago")
         season = find_regex(r"[\n\r].*season *([^\n\r p]*)", text_ocr)
         print("Season:", season)
 
@@ -281,8 +281,11 @@ def main():
             append_to_output(data)
             play_success_sound()
         else:
-            play_success_but_failure_sound()
-            print("Data incorrect, was not written to output.")
+            play_invalid_value_sound()
+            # Save screenshot and denoised image
+            cln_img.save("input/apex_stats_clean.png")
+            img.save("input/apex_screenshot.png")
+            print_error("Data incorrect, was not written to output.")
 
         if DEBUG:
             return
