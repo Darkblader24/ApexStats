@@ -175,7 +175,7 @@ def check_data(values):
 
 def clean_data(val):
     """ manual cleaning of potentially incorrectly recognized values """
-    result = val.replace("o", "0").replace("d", "0").replace("l", "1").replace(",", "")
+    result = val.replace("o", "0").replace("d", "0").replace("l", "1").replace(",", "").replace("/", "7")
     return result
 
 
