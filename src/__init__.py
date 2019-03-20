@@ -76,6 +76,7 @@ def play_success_but_failure_sound():
 
 
 def make_screenshot(monitor_id):
+    print("Processing...")
     with mss.mss() as sct:
         monitor = sct.monitors[monitor_id]
 
@@ -148,7 +149,7 @@ def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
             value = values[i]
             if not value:
                 value = "NONE"
-            file.write(value)
+            file.write(value.capitalize())
             if i != len(values) - 1:
                 file.write(delim)
         file.write("\n")
@@ -165,7 +166,7 @@ def check_data(values):
             all_digits = False
             print_error("INVALID VALUE:", value)
 
-        elif value.lower() not in legends and not value.replace(":", "").isdigit():
+        elif value not in legends and not value.replace(":", "").isdigit():
             all_digits = False
             print_error("INVALID VALUE:", value)
 
@@ -263,7 +264,7 @@ def main():
         legend = None
         for legend_name in legends:
             if close_match_in(legend_name, text_ocr):
-                legend = legend_name.capitalize()
+                legend = legend_name
                 break
         print("Legend:", legend)
 
