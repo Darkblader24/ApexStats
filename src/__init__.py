@@ -137,8 +137,7 @@ def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
     return
 
 
-# TODO: do not use manual index for legend name values
-def check_data(values, ignore_legend_index=3):
+def check_data(values):
     all_digits = True
 
     for i in range(0, len(values)):
@@ -148,7 +147,7 @@ def check_data(values, ignore_legend_index=3):
             all_digits = False
             print("WRONG", value)
 
-        elif i != ignore_legend_index and not value.replace(":", "").isdigit():
+        elif value not in legends and not value.replace(":", "").isdigit():
             all_digits = False
             print("WRONG", value)
 
@@ -254,7 +253,7 @@ def main():
         data = [season, group_size, time_survived, legend, damage_done, kills, revives, respawns, placement]
 
         # Check data for incorrect values, like None or non-digit values. Ignores the index value of the legend name
-        data_correct = check_data(data, ignore_legend_index=2)
+        data_correct = check_data(data)
 
         # Write data to output file and play sound
         if data_correct:
