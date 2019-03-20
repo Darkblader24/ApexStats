@@ -24,7 +24,7 @@ def clean_image(img):
 
     for i, color in enumerate(img.convert("HSV").getdata()):
         h, s, v = color
-        if (s <= 5 or s >= 204) and v > 127:
+        if (s <= 5 or s >= 204) and v > 104:
             new_img_data.append((0, 0, 0))
         elif s in range(56, 62) and v > 150:
             new_img_data.append((0, 0, 0))
@@ -52,6 +52,11 @@ def play_screenshot_sound():
     return
 
 
+def play_success_but_failure_sound():
+    winsound.PlaySound("sounds/failed.wav", winsound.SND_FILENAME)
+    return
+
+
 def make_screenshot(monitor_id):
     with mss.mss() as sct:
         monitor = sct.monitors[monitor_id]
@@ -65,11 +70,10 @@ def make_screenshot(monitor_id):
 
 
 def find_regex(expression, text):
-    result = None
     regex = re.findall(expression, text)
     if regex:
-        result = clean_data(regex[-1])
-    return result
+        return clean_data(regex[-1])
+    return None
 
 
 def is_close_match(s1, s2, tolerance=1, allow_different_length=True):
@@ -123,16 +127,36 @@ def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
     # write all values to the output file in given order
     with open(filepath, "a") as file:
         for i in range(0, len(values)):
-            file.write(values[i])
+            value = values[i]
+            if not value:
+                value = "NONE"
+            file.write(value)
             if i != len(values) - 1:
                 file.write(delim)
         file.write("\n")
     return
 
 
+def check_data(values, ignore_legend_index=2):
+    all_digits = True
+
+    for i in range(0, len(values)):
+        value = values[i]
+
+        if not value:
+            all_digits = False
+            print("WRONG", value)
+
+        elif i != ignore_legend_index and not value.replace(":", "").isdigit():
+            all_digits = False
+            print("WRONG", value)
+
+    return all_digits
+
+
 def clean_data(val):
     """ manual cleaning of potentially incorrectly recognized values """
-    result = val.replace("o", "0").replace("d", "0").replace(",", "")
+    result = val.replace("o", "0").replace("d", "0").replace("l", "1").replace(",", "")
     return result
 
 
@@ -187,7 +211,7 @@ def main():
 
         # match until newline, carriage return, comma, full-stop or space
         placement = find_regex(r"[\n\r].*# *([^\n\r., ]*)", text_ocr)
-        if int(placement) > 20:
+        if placement and int(placement) > 20:
             placement = placement[:-2]
         print("Placement:", placement)
 
@@ -228,8 +252,16 @@ def main():
         # order is determined by init_output_file
         data = [season, group_size, legend, damage_done, kills, revives, respawns, placement]
 
-        append_to_output(data)
-        play_success_sound()
+        # Check data for incorrect values, like None or non-digit values. Ignores the index value of the legend name
+        data_correct = check_data(data, ignore_legend_index=2)
+
+        # Write data to output file and play sound
+        if data_correct:
+            append_to_output(data)
+            play_success_sound()
+        else:
+            play_success_but_failure_sound()
+            print("Data incorrect, was not written to output.")
 
         if DEBUG:
             return
