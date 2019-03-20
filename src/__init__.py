@@ -121,7 +121,7 @@ def clean_image(img):
         if (s <= 5 or s >= 204) and v > 127:
             new_img_data.append((0, 0, 0))
         elif s in range(56, 62) and v > 150:
-            new_img_data.append((255, 0, 0))
+            new_img_data.append((0, 0, 0))
         else:
             new_img_data.append((255, 255, 255))
 
