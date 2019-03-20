@@ -106,8 +106,13 @@ def close_match_in(match, text, tolerance=1):
 def init_output_file(filepath="output/Apex Stats.txt", delim="\t"):
     # create a default output file with headers
     import os  # to check if the output file exists
+
+    dir_path = "/".join(filepath.split("/")[:-1])
+    if not os.path.isdir(dir_path):
+        os.mkdir(dir_path)
+
     if not os.path.isfile(filepath):
-        with open(filepath, "w") as file:
+        with open(filepath, "w+") as file:
             file.write("Initialized on: " + datetime.datetime.now().strftime("%d/%b/%Y, %H:%M:%S") + "\n")
             file.write(
                 "Season" + delim + "Group-Size" + delim + "Legend" + delim + "Damage" + delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")
@@ -148,7 +153,7 @@ def main():
 
 
             # Take a screenshot of the selected monitor
-            img = make_screenshot(monitor_id=1)
+            img = make_screenshot(monitor_id=3)
 
             # Remove noise from screenshot
             cln_img = clean_image(img)
@@ -162,6 +167,7 @@ def main():
 
         # Detect text from denoised screenshot
         text_ocr = pytesseract.image_to_string(cln_img).lower().replace("\n\n", "\n")
+        print("---------------------------------------------------------")
         print(text_ocr)
         print("---------------------------------------------------------")
 
