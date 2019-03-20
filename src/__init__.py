@@ -4,10 +4,11 @@ import mss
 import mss.tools
 from PIL import Image
 
-import keyboard
+import keyboard  # check button presses
+import datetime  # write date and time to output
 
 
-DEBUG = True
+DEBUG = False
 legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
            "wraith", "bangalore", "caustic", "mirage"]
 
@@ -68,52 +69,81 @@ def is_close_match(s1, s2, tolerance=1, allow_different_length=True):
     return exhausted <= tolerance
 
 
-def close_match_in(string, text, tolerance=1):
+def close_match_in(match, text, tolerance=1):
     """ returns whether or not a string is found as a close match within a text """
-    if string in text:
+    if match in text:
         return True
-    if len(string) >= len(text):
-        return is_close_match(string, text, tolerance=tolerance)
+    if len(match) >= len(text):
+        return is_close_match(match, text, tolerance=tolerance)
 
-    for i in range(0, len(text) - len(string)):
-        if is_close_match(string, text[i:i + len(string)]):
+    for i in range(0, len(text) - len(match)):
+        if is_close_match(match, text[i:i + len(match)]):
             return True
 
     return False
 
 
+def init_output_file(filepath="output/Apex Stats.txt", delim="\t"):
+    # create a default output file with headers
+    import os  # to check if the output file exists
+    if not os.path.isfile(filepath):
+        with open(filepath, "w") as file:
+            file.write("Initialized on: " + datetime.datetime.now().strftime("%d/%b/%Y, %H:%M:%S") + "\n")
+            file.write(
+                "Season" + delim + "Group-Size" + delim + "Legend" + delim + "Damage" + delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")
+    return
+
+
+def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
+    # write all values to the output file in given order
+    with open(filepath, "a") as file:
+        for i in range(0, len(values)):
+            file.write(values[i])
+            if i != len(values) - 1:
+                file.write(delim)
+        file.write("\n")
+    return
+
+
+def clean_data(values):
+    """ manual cleaning of potentially incorrectly recognized values """
+    # Season should be a number
+    return
+
+
 def main():
+
+    init_output_file()
 
     while True:
         if not DEBUG:
             # Check for input
             while True:
-                # Quit
                 if check_quit():
                     return
-                # Make screenshot
+                # Take screenshot
                 if keyboard.is_pressed("alt") and keyboard.is_pressed("k"):
                     break
 
-            # Make a screenshot of the selected monitor
+            # Take a screenshot of the selected monitor
             img = make_screenshot(monitor_id=1)
 
             # Remove noise from screenshot
             cln_img = clean_image(img)
         else:
             # Use test screenshot
-            cln_img = clean_image(Image.open("data/apex_screenshot_test_half.png"))
+            cln_img = clean_image(Image.open("input/apex_screenshot_test_half.png"))
 
         # Save screenshot and denoised image
-        img.save("data/apex_screenshot.png")
-        cln_img.save("data/apex_stats_clean.png")
+        # img.save("input/apex_screenshot.png")
+        cln_img.save("input/apex_stats_clean.png")
 
         # Detect text from denoised screenshot
         text_ocr = pytesseract.image_to_string(cln_img).lower().replace("\n\n", "\n")
         print(text_ocr)
         print("---------------------------------------------------------")
 
-        # Handle text data
+        # Handle text input
         if "xp breakdown" not in text_ocr:
             print("No Apex Match Summary found!")
             continue
@@ -148,10 +178,13 @@ def main():
             if close_match_in(legend_name, text_ocr):
                 legend = legend_name
                 break
-            # if legend_name in text_ocr:
-            #     legend = legend_name
-            #     break
         print("Legend:", legend.capitalize())
+
+        # order is determined by init_output_file
+        data = [season, group_size, legend, damage_done, kills, revives, respawns, placement]
+
+        clean_data(data)
+        append_to_output(data)
 
         if DEBUG:
             return
