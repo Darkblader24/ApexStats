@@ -15,6 +15,24 @@ legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
            "wraith", "bangalore", "caustic", "mirage"]
 
 
+def print_warning(*x, end="\n"):
+    print("\033[93m", end="")
+    for elem in x:
+        print(str(elem), end=" ")
+    print(end=end)
+    print("\033[0m", end="")
+    return
+
+
+def print_error(*x, end="\n"):
+    print("\033[31m", end="")
+    for elem in x:
+        print(str(elem), end=" ")
+    print(end=end)
+    print("\033[0m", end="")
+    return
+
+
 def check_quit():
     return keyboard.is_pressed("alt") and keyboard.is_pressed("q")
 
@@ -145,11 +163,13 @@ def check_data(values):
 
         if not value:
             all_digits = False
-            print("WRONG", value)
+            print_error("INVALID VALUE:", value)
+            # print("INVALID VALUE:", value)
 
         elif value not in legends and not value.replace(":", "").isdigit():
             all_digits = False
-            print("WRONG", value)
+            print_error("INVALID VALUE:", value)
+            # print("INVALID VALUE:", value)
 
     return all_digits
 
