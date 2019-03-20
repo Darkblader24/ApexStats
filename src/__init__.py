@@ -7,6 +7,7 @@ from PIL import Image
 import keyboard  # check button presses
 import datetime  # write date and time to output
 import time
+import winsound
 
 
 DEBUG = False
@@ -35,6 +36,22 @@ def clean_image(img):
     return new_img
 
 
+def play_success_sound():
+    winsound.PlaySound("sounds/success.wav", winsound.SND_FILENAME)
+    return
+
+
+def play_failure_sound():
+    # winsound.PlaySound("sounds/failed.wav", winsound.SND_FILENAME)
+    winsound.MessageBeep(winsound.MB_OK)
+    return
+
+
+def play_screenshot_sound():
+    winsound.PlaySound("sounds/screenshot.wav", winsound.SND_FILENAME)
+    return
+
+
 def make_screenshot(monitor_id):
     with mss.mss() as sct:
         monitor = sct.monitors[monitor_id]
@@ -42,6 +59,8 @@ def make_screenshot(monitor_id):
         sct_img = sct.grab(monitor)
 
         img = Image.frombytes("RGB", (sct_img.size[0], round(sct_img.size[1] * 0.45)), sct_img.bgra, "raw", "BGRX")
+
+        play_screenshot_sound()
     return img
 
 
@@ -147,8 +166,9 @@ def main():
         print("---------------------------------------------------------")
 
         # Handle text input
-        if "xp breakdown" not in text_ocr:
+        if not close_match_in("xp breakdown", text_ocr):
             print("No Apex Match Summary found!")
+            play_failure_sound()
             continue
 
         # See example: https://rubular.com/r/A4j1odfYdw7TWZ
@@ -200,6 +220,7 @@ def main():
         data = [season, group_size, legend, damage_done, kills, revives, respawns, placement]
 
         append_to_output(data)
+        play_success_sound()
 
         if DEBUG:
             return
