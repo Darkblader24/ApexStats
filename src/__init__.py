@@ -250,8 +250,11 @@ def main():
         # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
         # Lars' variant: [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
         placement = find_regex(r"[\n\r].*#([^\n\r,. )]*)|fe([^l\n\r,. )]*)|ff([^\n\r,. )]*)", text_ocr)
-        while placement and placement.isdigit() and int(placement) > 20:
-            placement = placement[:-1]
+        if placement and placement.isdigit():
+            while int(placement) > 20 and placement.endswith("20"):
+                placement = placement[:-2]
+            while int(placement) > 20:
+                placement = placement[:-1]
         print("Placement:", placement)
 
         # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
