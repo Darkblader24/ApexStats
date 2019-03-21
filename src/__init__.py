@@ -224,6 +224,7 @@ def clean_data(val):
     val = val.replace(",", "")
     val = val.replace("/", "7")
     val = val.replace("t", "7")
+    val = val.replace("s", "9")
     return val
 
 
