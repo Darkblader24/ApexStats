@@ -1,4 +1,6 @@
 import re
+from threading import Thread
+
 import pytesseract
 import mss
 import mss.tools
@@ -38,15 +40,20 @@ def check_quit():
 
 def clean_image(img):
     new_img_data = []
+    color_black = (0, 0, 0)
+    color_white = (255, 255, 255)
 
     for i, color in enumerate(img.convert("HSV").getdata()):
+        if i % img.size[0] > img.size[0] * 0.92:
+            new_img_data.append(color_white)
+            continue
         h, s, v = color
         if (s <= 5 or s >= 204) and v > 104:
-            new_img_data.append((0, 0, 0))
+            new_img_data.append(color_black)
         elif s in range(56, 62) and v > 150:
-            new_img_data.append((0, 0, 0))
+            new_img_data.append(color_black)
         else:
-            new_img_data.append((255, 255, 255))
+            new_img_data.append(color_white)
 
     new_img = Image.new(img.mode, img.size)
     new_img.putdata(new_img_data)
@@ -54,24 +61,24 @@ def clean_image(img):
 
 
 def play_success_sound():
-    winsound.PlaySound("sounds/success.wav", winsound.SND_FILENAME)
-    return
+    thread = Thread(target=winsound.PlaySound, args=["sounds/success.wav", winsound.SND_FILENAME])
+    thread.start()
 
 
 def play_failure_sound():
     # winsound.PlaySound("sounds/invalid_value.wav", winsound.SND_FILENAME)
-    winsound.MessageBeep(winsound.MB_OK)
-    return
+    thread = Thread(target=winsound.MessageBeep, args=[winsound.MB_OK])
+    thread.start()
 
 
 def play_screenshot_sound():
-    winsound.PlaySound("sounds/screenshot.wav", winsound.SND_FILENAME)
-    return
+    thread = Thread(target=winsound.PlaySound, args=["sounds/screenshot.wav", winsound.SND_FILENAME])
+    thread.start()
 
 
 def play_invalid_value_sound():
-    winsound.PlaySound("sounds/invalid_value.wav", winsound.SND_FILENAME)
-    return
+    thread = Thread(target=winsound.PlaySound, args=["sounds/invalid_value.wav", winsound.SND_FILENAME])
+    thread.start()
 
 
 def make_screenshot(monitor_id):
@@ -191,14 +198,15 @@ def clean_data(val):
 
 
 def main():
+
     init_output_file()
 
     while True:
 
-        print("Waiting for input...")
-        print("Press Alt + K to take a screenshot of your match summary.")
-
         if not DEBUG:
+            print("Waiting for input...")
+            print("Press Alt + K to take a screenshot of your match summary.")
+
             # Check for input
             while True:
                 if check_quit():
