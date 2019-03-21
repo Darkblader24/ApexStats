@@ -166,6 +166,7 @@ def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
             if i != len(values) - 1:
                 file.write(delim)
         file.write("\n")
+        return
 
 
 def is_equal_to_last_entry(values, filepath="output/Apex Stats.txt", delim="\t"):
@@ -278,11 +279,9 @@ def main():
         # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
         # Lars' variant: [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
         placement = find_regex(r"[\n\r].*#([^\n\r,. )]*)|fe([^l\n\r,. )]*)|ff([^\n\r,. )]*)", text_ocr)
-        if placement and placement.isdigit():
-            while int(placement) > 20 and placement.endswith("20"):
-                placement = placement[:-2]
-            while int(placement) > 20:
-                placement = placement[:-1]
+        # only 20 squads
+        while placement and placement.isdigit() and int(placement) > 20:
+            placement = placement[:-1]
         print("Placement:", placement)
 
         # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
