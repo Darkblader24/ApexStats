@@ -189,6 +189,7 @@ def check_data(values):
 def clean_data(val):
     """ manual cleaning of potentially incorrectly recognized values """
     val = val.replace("o", "0")
+    val = val.replace("c", "0")
     val = val.replace("d", "0")
     val = val.replace("l", "1")
     val = val.replace(",", "")
@@ -248,35 +249,35 @@ def main():
         # match until newline, carriage return, comma, full-stop or space
         # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
         # Lars' variant: [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
-        placement = find_regex(r"[\n\r].*#([^\n\r,. ]*)|fe([^l\n\r,. ]*)|ff([^\n\r,. ]*)", text_ocr)
-        if placement and placement.isdigit() and int(placement) > 20:
-            placement = placement[:-2]
+        placement = find_regex(r"[\n\r].*#([^\n\r,. )]*)|fe([^l\n\r,. )]*)|ff([^\n\r,. )]*)", text_ocr)
+        while placement and placement.isdigit() and int(placement) > 20:
+            placement = placement[:-1]
         print("Placement:", placement)
 
         # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
 
         # match until newline, carriage return, parenthesis or square bracket
-        kills = find_regex(r"[\n\r].*kills [(\[]x*([^\n\r)\]}]*)", text_ocr)
+        kills = find_regex(r"[\n\r].*kills [{(\[]x*([^\n\r)\]}]*)", text_ocr)
         print("Kills:", kills)
 
         # see above
-        time_survived = find_regex(r"[\n\r].*time survived [(\[]*([^\n\r)\]}]*)", text_ocr)
+        time_survived = find_regex(r"[\n\r].*time survived [{(\[]*([^\n\r)\]}]*)", text_ocr)
         print("Time Survived:", time_survived)
 
         # match damage done or damage cone
-        damage_done = find_regex(r"[\n\r].*damage [dcu]one [(\[]*([^\n\r)\]}]*)", text_ocr)
+        damage_done = find_regex(r"[\n\r].*damage [dcu]one [{(\[]*([^\n\r)\]}]*)", text_ocr)
         print("Damage Done:", damage_done)
 
         # see above
-        revives = find_regex(r"[\n\r].*revive ally [(\[]x*([^\n\r)\]}]*)", text_ocr)
+        revives = find_regex(r"[\n\r].*revive ally [{(\[]x*([^\n\r)\]}]*)", text_ocr)
         print("Revives:", revives)
 
         # see above
-        respawns = find_regex(r"[\n\r].*respawn ally [(\[]x*([^\n\r)\]}]*)", text_ocr)
+        respawns = find_regex(r"[\n\r].*respawn ally [{(\[]x*([^\n\r)\]}]*)", text_ocr)
         print("Respawns:", respawns)
 
         # see above
-        group_size = str(int(find_regex(r"[\n\r].*playing with friends [(\[]x*([^\n\r)\]}]*)", text_ocr)) + 1)
+        group_size = str(int(find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr)) + 1)
         print("Group Size:", group_size)
 
         # legend names are selected from a set list (with some tolerance)
