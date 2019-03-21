@@ -277,14 +277,19 @@ def main():
 
         # match until newline, carriage return, comma, full-stop or space
         # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
-        # Lars' variant: [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
+        # Lars' variant:
+        # [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
         placement = find_regex(r"[\n\r].*#([^\n\r,. )]*)|fe([^l\n\r,. )]*)|ff([^\n\r,. )]*)", text_ocr)
+
+        # if placement is recognized as 120, there is no way to determine whether the
+        # player placed first or twelfth
+        if placement == "120":
+            print_error("Could not recognize placement. Please try gain.")
+            play_invalid_value_sound()
+            continue
         # only 20 squads
         while placement and placement.isdigit() and int(placement) > 20:
-            if placement.endswith("20"):
-                placement = placement[:-2]
-            else:
-                placement = placement[:-1]
+            placement = placement[:-1]
         print("Placement:", placement)
 
         # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
