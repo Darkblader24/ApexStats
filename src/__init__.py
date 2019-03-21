@@ -223,7 +223,7 @@ def main():
             cln_img = clean_image(img)
         else:
             # Use test screenshot
-            img = Image.open("input/apex_screenshot.png")
+            img = None
             cln_img = clean_image(Image.open("input/apex_screenshot_test_half.png"))
 
         # Detect text from denoised screenshot
@@ -246,8 +246,9 @@ def main():
 
         # match until newline, carriage return, comma, full-stop or space
         # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
-        placement = find_regex(r"[\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])", text_ocr)
-        if placement and int(placement) > 20:
+        # Lars' variant: [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
+        placement = find_regex(r"[\n\r].*#([^\n\r,. ]*)|fe([^l\n\r,. ]*)|ff([^\n\r,. ]*)", text_ocr)
+        if placement and placement.isdigit() and int(placement) > 20:
             placement = placement[:-2]
         print("Placement:", placement)
 
@@ -299,7 +300,8 @@ def main():
             play_invalid_value_sound()
             # Save screenshot and denoised image
             cln_img.save("input/apex_stats_clean.png")
-            img.save("input/apex_screenshot.png")
+            if not DEBUG:
+                img.save("input/apex_screenshot.png")
             print_error("Data incorrect, was not written to output.")
 
         if DEBUG:
