@@ -293,7 +293,7 @@ def main():
         # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
         # Lars' variant:
         # [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
-        placement = find_regex(r"[\n\r].*#([^\n\r,. )]*)|fe([^l\n\r,. )]*)|ff([^\n\r,. )]*)", text_ocr)
+        placement = find_regex(r"[\n\r].*#([^\n\r_,. )]*)|fe([^l\n\r_,. )]*)|ff([^\n\r_,. )]*)|he ([^0\n\r_,. )]*)", text_ocr)
 
         # if placement is recognized as 120, there is no way to determine whether the
         # player placed first or twelfth
