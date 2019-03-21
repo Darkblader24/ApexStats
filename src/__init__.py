@@ -293,7 +293,7 @@ def main():
         # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
         # Lars' variant:
         # [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
-        placement = find_regex(r"[\n\r].*#([^\n\r_,. )]*)|fe([^l\n\r_,. )]*)|ff([^\n\r_,. )]*)|he ([^0\n\r_,. )]*)", text_ocr)
+        placement = find_regex(r"[\n\r].*#([^\n\r_,. )]*)|fe([^l\n\r_,. )]*)|ff([^\n\r_,. )]*)|he ([^0d\n\r_,. )]*)", text_ocr)
 
         # if placement is recognized as 120, there is no way to determine whether the
         # player placed first or twelfth
@@ -318,14 +318,14 @@ def main():
 
         # match damage done or damage cone
         damage_done = find_regex(r"[\n\r].*damage [dcu]one [{(\[]*([^\n\r)\]}]*)", text_ocr)
-        print("Damage Done:", damage_done)
+        print("Damage Done:", damage_done)  # TODO: Detects 190 as 180 sometimes o.o
 
         # see above
-        revives = find_regex(r"[\n\r].*revive ally [{(\[]x*([^\n\r)\]}]*)", text_ocr)
+        revives = find_regex(r"[\n\r].*revive al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr)
         print("Revives:", revives)
 
         # see above
-        respawns = find_regex(r"[\n\r].*respawn ally [{(\[]x*([^\n\r)\]}]*)", text_ocr)
+        respawns = find_regex(r"[\n\r].*respawn al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr)
         print("Respawns:", respawns)
 
         # see above
