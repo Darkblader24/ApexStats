@@ -152,7 +152,6 @@ def init_output_file(filepath="output/Apex Stats.txt", delim="\t"):
             file.write(
                 "Season" + delim + "Group-Size" + delim + "Time Survived" + delim + "Legend" + delim + "Damage" +
                 delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")
-    return
 
 
 def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
@@ -220,6 +219,7 @@ def clean_data(val):
     val = val.replace("o", "0")
     val = val.replace("c", "0")
     val = val.replace("d", "0")
+    val = val.replace("e", "2")
     val = val.replace("l", "1")
     val = val.replace(",", "")
     val = val.replace("/", "7")
@@ -265,6 +265,19 @@ def main():
 
         # Handle text input
         if not close_match_in("xp breakdown", text_ocr):
+            print_error("No Apex Match Summary found!")
+            play_failure_sound()
+            continue
+
+        # Search for legend. legend names are selected from a set list (with some tolerance)
+        legend = None
+        for legend_name in legends:
+            if close_match_in(legend_name, text_ocr):
+                legend = legend_name
+                break
+
+        # Cancel if no legend was found
+        if not legend:
             print_error("No Apex Match Summary found!")
             play_failure_sound()
             continue
@@ -318,12 +331,6 @@ def main():
         group_size = str(int(find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr)) + 1)
         print("Group Size:", group_size)
 
-        # legend names are selected from a set list (with some tolerance)
-        legend = None
-        for legend_name in legends:
-            if close_match_in(legend_name, text_ocr):
-                legend = legend_name
-                break
         print("Legend:", legend.capitalize())
 
         # order is determined by init_output_file
