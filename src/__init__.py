@@ -166,7 +166,35 @@ def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
             if i != len(values) - 1:
                 file.write(delim)
         file.write("\n")
-    return
+
+
+def is_equal_to_last_entry(values, filepath="output/Apex Stats.txt", delim="\t"):
+    # Checks if the last entry in the stats file equals the new to be written entry
+    with open(filepath, "r") as file:
+        data = file.read()
+
+    # Skip if the file only consists of the first two lines
+    data = data.split("\n")
+    if len(data) <= 2:
+        return False
+
+    # Check the last and second to last entries, in case the last line is empty
+    data1 = data[-1].split(delim)
+    data2 = data[-2].split(delim)
+    if len(data1) == len(values):
+        data = data1
+    elif len(data2) == len(values) and "Season" not in data2:
+        data = data2
+    else:
+        return False
+
+    # Compare the last and new entries
+    for i in range(len(values)):
+        if data[i] != values[i].capitalize():
+            return False
+
+    # Return true if they are truly equal
+    return True
 
 
 def check_data(values):
@@ -236,7 +264,7 @@ def main():
 
         # Handle text input
         if not close_match_in("xp breakdown", text_ocr):
-            print("No Apex Match Summary found!")
+            print_error("No Apex Match Summary found!")
             play_failure_sound()
             continue
 
@@ -299,7 +327,10 @@ def main():
 
         # Write data to output file and play sound
         if data_correct:
-            append_to_output(data)
+            if not is_equal_to_last_entry(data):
+                append_to_output(data)
+            else:
+                print_warning("Duplicate entry")
             play_success_sound()
         else:
             play_invalid_value_sound()
