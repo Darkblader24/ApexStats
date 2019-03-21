@@ -204,6 +204,7 @@ def main():
     while True:
 
         if not DEBUG:
+            print("---------------------------------------------------------")
             print("Waiting for input...")
             print("Press Alt + K to take a screenshot of your match summary.")
 
@@ -284,7 +285,7 @@ def main():
             if close_match_in(legend_name, text_ocr):
                 legend = legend_name
                 break
-        print("Legend:", legend)
+        print("Legend:", legend.capitalize())
 
         # order is determined by init_output_file
         data = [season, group_size, time_survived, legend, damage_done, kills, revives, respawns, placement]
