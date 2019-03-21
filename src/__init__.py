@@ -90,6 +90,12 @@ def make_screenshot(monitor_id):
 def find_regex(expression, text):
     regex = re.findall(expression, text)
     if regex:
+        # transform regex from list of tuples to list
+        if isinstance(regex[-1], tuple):
+            regex = [regex[i][j] for i in range(0, len(regex)) for j in range(0, len(regex[i]))]
+        # accept only the last non-empty match (eases up writing regex)
+        while not regex[-1]:
+            regex = regex[:-1]
         return clean_data(regex[-1])
     return None
 
@@ -231,7 +237,8 @@ def main():
         print("Season:", season)
 
         # match until newline, carriage return, comma, full-stop or space
-        placement = find_regex(r"[\n\r].*# *([^\n\r., ]*)", text_ocr)
+        # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
+        placement = find_regex(r"[\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])", text_ocr)
         if placement and int(placement) > 20:
             placement = placement[:-2]
         print("Placement:", placement)
