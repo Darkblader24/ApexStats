@@ -38,28 +38,6 @@ def check_quit():
     return keyboard.is_pressed("alt") and keyboard.is_pressed("q")
 
 
-def clean_image(img):
-    new_img_data = []
-    color_black = (0, 0, 0)
-    color_white = (255, 255, 255)
-
-    for i, color in enumerate(img.convert("HSV").getdata()):
-        if i % img.size[0] > img.size[0] * 0.92:
-            new_img_data.append(color_white)
-            continue
-        h, s, v = color
-        if (s <= 5 or s >= 204) and v > 104:
-            new_img_data.append(color_black)
-        elif s in range(56, 62) and v > 150:
-            new_img_data.append(color_black)
-        else:
-            new_img_data.append(color_white)
-
-    new_img = Image.new(img.mode, img.size)
-    new_img.putdata(new_img_data)
-    return new_img
-
-
 def play_success_sound():
     thread = Thread(target=winsound.PlaySound, args=["sounds/success.wav", winsound.SND_FILENAME])
     thread.start()
@@ -81,17 +59,74 @@ def play_invalid_value_sound():
     thread.start()
 
 
-def make_screenshot(monitor_id):
+def take_screenshot(sct, monitor):
+    sct_img = sct.grab(monitor)
+    return Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
+
+
+def take_screenshots(monitor_id):
     print("Processing...")
     with mss.mss() as sct:
-        monitor = sct.monitors[monitor_id]
+        mon = sct.monitors[monitor_id]
+        height = mon["height"]
+        width = mon["width"]
 
-        sct_img = sct.grab(monitor)
+        monitor_area_1 = {
+            "top": mon["top"] + int(0.12*height),    # X px from the top
+            "left": mon["left"] + int(0.112*width),  # X px from the left
+            "height": int(0.324*height),
+            "width": int(0.65*width),
+            "mon": monitor_id,
+        }
+        img1 = take_screenshot(sct, monitor_area_1)
 
-        img = Image.frombytes("RGB", (sct_img.size[0], round(sct_img.size[1] * 0.45)), sct_img.bgra, "raw", "BGRX")
+        monitor_area_2 = {
+            "top": mon["top"] + 0,
+            "left": mon["left"] + int(0.766*width),
+            "height": int(0.157*height),
+            "width": int(0.115*width),
+            "mon": monitor_id,
+        }
+        img2 = take_screenshot(sct, monitor_area_2)
 
         play_screenshot_sound()
-    return img
+    return img1, img2
+
+
+def clean_image_stats(img):
+    new_img_data = []
+    color_black = (0, 0, 0)
+    color_white = (255, 255, 255)
+
+    for i, color in enumerate(img.convert("HSV").getdata()):
+        h, s, v = color
+        if (s <= 5 or s >= 204) and v > 104:
+            new_img_data.append(color_black)
+        elif s in range(56, 62) and v > 150:
+            new_img_data.append(color_black)
+        else:
+            new_img_data.append(color_white)
+
+    new_img = Image.new(img.mode, img.size)
+    new_img.putdata(new_img_data)
+    return new_img
+
+
+def clean_image_placement(img):
+    new_img_data = []
+    color_black = (0, 0, 0)
+    color_white = (255, 255, 255)
+
+    for i, color in enumerate(img.convert("HSV").getdata()):
+        h, s, v = color
+        if h in range(9, 11):
+            new_img_data.append(color_black)
+        else:
+            new_img_data.append(color_white)
+
+    new_img = Image.new(img.mode, img.size)
+    new_img.putdata(new_img_data)
+    return new_img
 
 
 def find_regex(expression, text):
@@ -219,12 +254,12 @@ def clean_data(val):
     val = val.replace("o", "0")
     val = val.replace("c", "0")
     val = val.replace("d", "0")
-    val = val.replace("e", "2")
     val = val.replace("l", "1")
     val = val.replace(",", "")
-    val = val.replace("/", "7")
-    val = val.replace("t", "7")
-    val = val.replace("s", "9")
+    # val = val.replace("e", "2")
+    # val = val.replace("/", "7")
+    # val = val.replace("t", "7")
+    # val = val.replace("s", "9")
     return val
 
 
@@ -249,23 +284,27 @@ def main():
                 time.sleep(0.01)
 
             # Take a screenshot of the selected monitor
-            img = make_screenshot(monitor_id=1)
+            img_stats, img_placement = take_screenshots(monitor_id=3)
 
             # Remove noise from screenshot
-            cln_img = clean_image(img)
+            cln_img_stats = clean_image_stats(img_stats)
+            cln_img_placement = clean_image_placement(img_placement)
         else:
             # Use test screenshot
-            img = None
-            cln_img = clean_image(Image.open("input/apex_screenshot_test_half.png"))
+            img_stats, img_placement = None, None
+            cln_img_stats = clean_image_stats(Image.open("input/apex_area_stats_test.png"))
+            cln_img_placement = clean_image_placement(Image.open("input/apex_area_placement_test.png"))
 
         # Detect text from denoised screenshot
-        text_ocr = pytesseract.image_to_string(cln_img).lower().replace("\n\n", "\n")
+        text_ocr_stats = pytesseract.image_to_string(cln_img_stats).lower().replace("\n\n", "\n")
+        text_ocr_placement = pytesseract.image_to_string(cln_img_placement).lower()
         print("---------------------------------------------------------")
-        print(text_ocr)
+        print(text_ocr_stats)
+        print("Placement:", text_ocr_placement)
         print("---------------------------------------------------------")
 
         # Handle text input
-        if not close_match_in("xp breakdown", text_ocr):
+        if not close_match_in("xp breakdown", text_ocr_stats):
             print_error("No Apex Match Summary found!")
             play_failure_sound()
             continue
@@ -273,7 +312,7 @@ def main():
         # Search for legend. legend names are selected from a set list (with some tolerance)
         legend = None
         for legend_name in legends:
-            if close_match_in(legend_name, text_ocr):
+            if close_match_in(legend_name, text_ocr_stats):
                 legend = legend_name
                 break
 
@@ -286,56 +325,42 @@ def main():
         # See example: https://rubular.com/r/A4j1odfYdw7TWZ
         # select all characters after "season" that until we match newline, carriage return, space or p
         # (season is followed by " played x mins ago")
-        season = find_regex(r"[\n\r].*season *([^\n\r p]*)", text_ocr)
-        print("Season:", season)
-
-        # match until newline, carriage return, comma, full-stop or space
-        # OCR likes to detect the giant # as either ff or fe, so we have to check for those too
-        # Lars' variant:
-        # [\n\r]match.*[#f][fe]?([^\n\r,. 'line']*)|squad.*[#f][fe]?([^\n\r,. 'line']*)|#([^\n\r., 'line'])
-        placement = find_regex(r"[\n\r].*#([^\n\r_,. )]*)|fe([^l\n\r_,. )]*)|ff([^\n\r_,. )]*)|he ([^0d\n\r_,. )]*)", text_ocr)
-
-        # if placement is recognized as 120, there is no way to determine whether the
-        # player placed first or twelfth
-        if placement == "120":
-            print_error("Could not recognize placement. Please try gain.")
-            play_invalid_value_sound()
-            continue
-        # only 20 squads
-        while placement and placement.isdigit() and int(placement) > 20:
-            placement = placement[:-1]
-        print("Placement:", placement)
+        season = find_regex(r"[\n\r].*season *([^\n\r p]*)", text_ocr_stats)
 
         # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
 
         # match until newline, carriage return, parenthesis or square bracket
-        kills = find_regex(r"[\n\r].*kills [{(\[]x*([^\n\r)\]}]*)", text_ocr)
-        print("Kills:", kills)
+        kills = find_regex(r"[\n\r].*kills [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)  # TODO: Detects 190 as 180 sometimes o.o
 
         # see above
-        time_survived = find_regex(r"[\n\r].*time survived [{(\[]*([^\n\r)\]}]*)", text_ocr)
-        print("Time Survived:", time_survived)
+        time_survived = find_regex(r"[\n\r].*time survived [{(\[]*([^\n\r)\]}]*)", text_ocr_stats)
 
         # match damage done or damage cone
-        damage_done = find_regex(r"[\n\r].*damage [dcu]one [{(\[]*([^\n\r)\]}]*)", text_ocr)
-        print("Damage Done:", damage_done)  # TODO: Detects 190 as 180 sometimes o.o
+        damage_done = find_regex(r"[\n\r].*damage [dcu]one [{(\[]*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        revives = find_regex(r"[\n\r].*revive al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr)
-        print("Revives:", revives)
+        revives = find_regex(r"[\n\r].*revive al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        respawns = find_regex(r"[\n\r].*respawn al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr)
-        print("Respawns:", respawns)
+        respawns = find_regex(r"[\n\r].*respawn al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        group_size = str(int(find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr)) + 1)
-        print("Group Size:", group_size)
+        group_size = str(int(find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)) + 1)
 
-        print("Legend:", legend.capitalize())
+        # Read placement from other image
+        placement = text_ocr_placement.replace("#", "")
 
         # order is determined by init_output_file
         data = [season, group_size, time_survived, legend, damage_done, kills, revives, respawns, placement]
+        print("Season:", season)
+        print("Placement:", placement)
+        print("Legend:", legend.capitalize())
+        print("Kills:", kills)
+        print("Damage Done:", damage_done)
+        print("Revives:", revives)
+        print("Respawns:", respawns)
+        print("Group Size:", group_size)
+        print("Time Survived:", time_survived)
 
         # Check data for incorrect values, like None or non-digit values. Ignores the index value of the legend name
         data_correct = check_data(data)
@@ -350,9 +375,11 @@ def main():
         else:
             play_invalid_value_sound()
             # Save screenshot and denoised image
-            cln_img.save("input/apex_stats_clean.png")
+            cln_img_stats.save("input/apex_clean_1.png")
+            cln_img_placement.save("input/apex_clean_2.png")
             if not DEBUG:
-                img.save("input/apex_screenshot.png")
+                img_stats.save("input/apex_area_1.png")
+                img_placement.save("input/apex_area_2.png")
             print_error("Data incorrect, was not written to output.")
 
         if DEBUG:
