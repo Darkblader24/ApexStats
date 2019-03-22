@@ -284,7 +284,7 @@ def main():
                 time.sleep(0.01)
 
             # Take a screenshot of the selected monitor
-            img_stats, img_placement = take_screenshots(monitor_id=3)
+            img_stats, img_placement = take_screenshots(monitor_id=1)
 
             # Remove noise from screenshot
             cln_img_stats = clean_image_stats(img_stats)
@@ -292,8 +292,8 @@ def main():
         else:
             # Use test screenshot
             img_stats, img_placement = None, None
-            cln_img_stats = clean_image_stats(Image.open("input/apex_area_stats_test.png"))
-            cln_img_placement = clean_image_placement(Image.open("input/apex_area_placement_test.png"))
+            cln_img_stats = clean_image_stats(Image.open("input/area_stats_test.png"))
+            cln_img_placement = clean_image_placement(Image.open("input/area_placement_test.png"))
 
         # Detect text from denoised screenshot
         text_ocr_stats = pytesseract.image_to_string(cln_img_stats).lower().replace("\n\n", "\n")
@@ -375,11 +375,11 @@ def main():
         else:
             play_invalid_value_sound()
             # Save screenshot and denoised image
-            cln_img_stats.save("input/apex_clean_1.png")
-            cln_img_placement.save("input/apex_clean_2.png")
+            cln_img_stats.save("input/clean_stats.png")
+            cln_img_placement.save("input/clean_placement.png")
             if not DEBUG:
-                img_stats.save("input/apex_area_1.png")
-                img_placement.save("input/apex_area_2.png")
+                img_stats.save("input/stats.png")
+                img_placement.save("input/placement.png")
             print_error("Data incorrect, was not written to output.")
 
         if DEBUG:
