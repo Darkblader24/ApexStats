@@ -9,6 +9,7 @@ import pytesseract
 import time
 
 DEBUG = False
+save_all_images = False
 
 
 def check_data(values):
@@ -28,12 +29,31 @@ def check_data(values):
     return all_digits
 
 
+def find_better_placement_value(placement1, placement2):
+    if "#" in placement1:
+        return placement1
+    if "#" in placement2:
+        return placement2
+
+    for i in range(0, 20):
+        if is_close_match(placement1, "#" + str(i), tolerance=1):
+            return placement1
+        if is_close_match(placement2, "#" + str(i), tolerance=1):
+            return placement2
+    return ""
+
+
 def main():
     init_output_file()
 
     while True:
 
-        if not DEBUG:
+        if DEBUG:
+            # Use test screenshot
+            img_stats, img_placement = None, None
+            cln_img_stats = clean_image_stats(Image.open(images_path + test_stats_name))
+            cln_img_placement = clean_image_placement(Image.open(images_path + test_placement_name))
+        else:
             print("---------------------------------------------------------")
             print("Waiting for input...")
             print("Press Alt + K to take a screenshot of your match summary.")
@@ -53,25 +73,20 @@ def main():
             # Remove noise from screenshot
             cln_img_stats = clean_image_stats(img_stats)
             cln_img_placement = clean_image_placement(img_placement)
-        else:
-            # Use test screenshot
-            img_stats, img_placement = None, None
-            cln_img_stats = clean_image_stats(Image.open(images_path + test_stats_name))
-            cln_img_placement = clean_image_placement(Image.open(images_path + test_placement_name))
 
         # Detect text from denoised screenshot
-        text_ocr_stats = pytesseract.image_to_string(cln_img_stats).lower().replace("\n\n", "\n")
-        text_ocr_placement = pytesseract.image_to_string(cln_img_placement).lower()
+        text_ocr_stats = pytesseract.image_to_string(cln_img_stats, lang="eng").lower().replace("\n\n", "\n")
+        # TODO: add:
+        #  --oem 0 -c tessedit_char_whitelist=0123456789#
+        #  to the placement config and replace eng.traineddata with an older version (this one's corrupt)
+        #  if it works, replace --psm 13 with --psm 7
+        text_ocr_placement = pytesseract.image_to_string(cln_img_placement, config="--psm 13 -c tessedit_char_whitelist=0123456789#")
+        text_ocr_placement_alternative = pytesseract.image_to_string(cln_img_placement)
         print("---------------------------------------------------------")
         print(text_ocr_stats)
         print("Placement:", text_ocr_placement)
+        print("Alternate Placement:", text_ocr_placement_alternative)
         print("---------------------------------------------------------")
-
-        # Handle text input
-        if not close_match_in("xp breakdown", text_ocr_stats):
-            print_error("No Apex Match Summary found!")
-            play_failure_sound()
-            continue
 
         # Search for legend. legend names are selected from a set list (with some tolerance)
         legend = None
@@ -113,7 +128,7 @@ def main():
         group_size = str(int(find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)) + 1)
 
         # Read placement from other image
-        placement = text_ocr_placement.replace("#", "")
+        placement = find_better_placement_value(text_ocr_placement, text_ocr_placement_alternative).replace("#", "")
 
         # order is determined by init_output_file
         data = [season, group_size, time_survived, legend, damage_done, kills, revives, respawns, placement]
@@ -137,15 +152,17 @@ def main():
             else:
                 print_warning("Duplicate entry")
             play_success_sound()
-        else:
-            play_invalid_value_sound()
-            # Save screenshot and denoised image
+
+        if save_all_images or not data_correct:
+            if not data_correct:
+                play_invalid_value_sound()
+                print_error("Data invalid, was not written to output.")
             cln_img_stats.save(images_path + clean_stats_name)
             cln_img_placement.save(images_path + clean_placement_name)
             if not DEBUG:
                 img_stats.save(images_path + stats_name)
                 img_placement.save(images_path + placement_name)
-            print_error("Data incorrect, was not written to output.")
+            print_special("Saved all images.")
 
         if DEBUG:
             return

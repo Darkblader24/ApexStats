@@ -3,6 +3,15 @@ import keyboard
 import re
 
 
+def print_special(*x, end="\n"):
+    print("\033[92m", end="")
+    for elem in x:
+        print(str(elem), end=" ")
+    print(end=end)
+    print("\033[0m", end="")
+    return
+
+
 def print_warning(*x, end="\n"):
     print("\033[93m", end="")
     for elem in x:
@@ -12,6 +21,7 @@ def print_warning(*x, end="\n"):
     return
 
 
+# Consider using file=sys.stderr
 def print_error(*x, end="\n"):
     print("\033[31m", end="")
     for elem in x:
