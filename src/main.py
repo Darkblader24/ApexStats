@@ -130,7 +130,9 @@ def main():
         # Read placement from other image
         placement = find_better_placement_value(text_ocr_placement, text_ocr_placement_alternative).replace("#", "")
         # clean placement some more (sometimes "#" is recognized as "4")
-        if 41 <= int(placement) <= 49:
+        if not placement or not placement.isdigit():
+            placement = None
+        elif 41 <= int(placement) <= 49:
             placement = str(int(placement) - 40)
         elif 410 <= int(placement) <= 419:
             placement = str(int(placement) - 400)
