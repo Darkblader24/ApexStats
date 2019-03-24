@@ -69,7 +69,8 @@ def is_close_match(s1, s2, tolerance=1, allow_different_length=True):
     if not allow_different_length and len(s1) != len(s2):
         return False
 
-    exhausted = abs(len(s1) - len(s2))
+    # exhausted = abs(len(s1) - len(s2))
+    exhausted = 0
     for i in range(0, min(len(s1), len(s2))):
         if s1[i] != s2[i]:
             exhausted += 1

@@ -29,6 +29,7 @@ def check_data(values):
     return all_digits
 
 
+# TODO: fix incorrect comparison with "4" etc.
 def find_better_placement_value(placement1, placement2):
     if "#" in placement1:
         return placement1
@@ -130,10 +131,11 @@ def main():
         # Read placement from other image
         placement = find_better_placement_value(text_ocr_placement, text_ocr_placement_alternative).replace("#", "")
         # clean placement some more (sometimes "#" is recognized as "4")
-        if 41 <= int(placement) <= 49:
-            placement = str(int(placement) - 40)
-        elif 410 <= int(placement) <= 419:
-            placement = str(int(placement) - 400)
+        if placement and placement.isdigit():
+            if 41 <= int(placement) <= 49:
+                placement = str(int(placement) - 40)
+            elif 410 <= int(placement) <= 419:
+                placement = str(int(placement) - 400)
 
         # order is determined by init_output_file
         data = [season, group_size, time_survived, legend, damage_done, kills, revives, respawns, placement]
