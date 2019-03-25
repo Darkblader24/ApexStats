@@ -8,6 +8,7 @@ import pytesseract
 import time
 
 DEBUG = False
+save_data_with_debug = False  # if you want to save the data to the output file even though you're in debug mode
 save_all_images = True
 
 
@@ -148,7 +149,7 @@ def main():
 
         # Write data to output file and play sound
         if data_correct:
-            if not is_equal_to_last_entry(data):
+            if not is_equal_to_last_entry(data) and not (DEBUG and save_data_with_debug):
                 append_to_output(data)
             else:
                 print_warning("Duplicate entry")
