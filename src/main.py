@@ -4,7 +4,6 @@ from src.utils import *
 from src.imaging import *
 from src.file_io import *
 
-
 import pytesseract
 import time
 

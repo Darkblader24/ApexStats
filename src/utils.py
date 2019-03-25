@@ -37,11 +37,11 @@ def check_quit():
 
 def clean_data(val):
     """ manual cleaning of potentially incorrectly recognized values """
-    val = val.replace("o", "0")
-    val = val.replace("c", "0")
-    val = val.replace("d", "0")
-    val = val.replace("l", "1")
-    val = val.replace(",", "")
+    val = val.replace("o", "0")\
+        .replace("c", "0")\
+        .replace("d", "0")\
+        .replace("l", "1")\
+        .replace(",", "")
     # val = val.replace("e", "2")
     # val = val.replace("/", "7")
     # val = val.replace("t", "7")
