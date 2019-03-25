@@ -1,8 +1,10 @@
 
 import datetime  # write date and time to output
 
+from src.resources import *
 
-def is_equal_to_last_entry(values, filepath="output/Apex Stats.txt", delim="\t"):
+
+def is_equal_to_last_entry(values, filepath=output_path + output_stats_name, delim="\t"):
     # Checks if the last entry in the stats file equals the new to be written entry
     with open(filepath, "r") as file:
         data = file.read()
@@ -31,13 +33,15 @@ def is_equal_to_last_entry(values, filepath="output/Apex Stats.txt", delim="\t")
     return True
 
 
-def init_output_file(filepath="output/Apex Stats.txt", delim="\t"):
+def init_output_file(filepath=output_path + output_stats_name, delim="\t"):
     # create a default output file with headers
     import os  # to check if the output file exists
 
     dir_path = "/".join(filepath.split("/")[:-1])
     if not os.path.isdir(dir_path):
         os.mkdir(dir_path)
+    if not os.path.isdir(output_images_path):
+        os.mkdir(output_images_path)
 
     if not os.path.isfile(filepath):
         with open(filepath, "w+") as file:
@@ -47,7 +51,7 @@ def init_output_file(filepath="output/Apex Stats.txt", delim="\t"):
                 delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")
 
 
-def append_to_output(values, filepath="output/Apex Stats.txt", delim="\t"):
+def append_to_output(values, filepath=output_path + output_stats_name, delim="\t"):
     # write all values to the output file in given order
     with open(filepath, "a") as file:
         for i in range(0, len(values)):

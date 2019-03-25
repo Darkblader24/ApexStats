@@ -6,17 +6,24 @@ from threading import Thread
 legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
            "wraith", "bangalore", "caustic", "mirage"]
 
-images_path = "input/"
+test_images_path = "resources/test_images/"
+sounds_path = "resources/sounds/"
+output_path = "output/"
+output_images_path = "output/images/"
 
-stats_name = "raw_stats.png"
-placement_name = "raw_placement.png"
+raw_stats_name = "raw_stats.png"
+raw_placement_name = "raw_placement.png"
 clean_stats_name = "clean_stats.png"
 clean_placement_name = "clean_placement.png"
-
 test_stats_name = "test_stats.png"
 test_placement_name = "test_placement.png"
 
+output_stats_name = "Apex Stats.txt"
+
 trained_data_name = "TT"
+
+
+
 
 
 def play_success_sound():

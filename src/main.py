@@ -4,7 +4,6 @@ from src.utils import *
 from src.imaging import *
 from src.file_io import *
 
-
 import pytesseract
 import time
 
@@ -52,8 +51,8 @@ def main():
         if DEBUG:
             # Use test screenshot
             img_stats, img_placement = None, None
-            cln_img_stats = clean_image_stats(Image.open(images_path + test_stats_name))
-            cln_img_placement = clean_image_placement(Image.open(images_path + test_placement_name))
+            cln_img_stats = clean_image_stats(Image.open(test_images_path + test_stats_name))
+            cln_img_placement = clean_image_placement(Image.open(test_images_path + test_placement_name))
         else:
             print("---------------------------------------------------------")
             print("Waiting for input...")
@@ -127,7 +126,11 @@ def main():
         respawns = find_regex(r"[\n\r].*respawn al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        group_size = str(int(find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)) + 1)
+        group_size = find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
+        if group_size and group_size.isdigit():
+            group_size = str(int(group_size) + 1)
+        else:
+            group_size = None
 
         # Read placement from other image
         placement = find_better_placement_value(text_ocr_placement, text_ocr_placement_alternative).replace("#", "")
@@ -167,11 +170,11 @@ def main():
             print_error("Data invalid, was not written to output.")
 
         if save_all_images:
-            cln_img_stats.save(images_path + clean_stats_name)
-            cln_img_placement.save(images_path + clean_placement_name)
+            cln_img_stats.save(output_images_path + clean_stats_name)
+            cln_img_placement.save(output_images_path + clean_placement_name)
             if not DEBUG:
-                img_stats.save(images_path + stats_name)
-                img_placement.save(images_path + placement_name)
+                img_stats.save(output_images_path + raw_stats_name)
+                img_placement.save(output_images_path + raw_placement_name)
             print_special("Saved all images.")
 
         if DEBUG:
