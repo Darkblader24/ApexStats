@@ -27,7 +27,7 @@ trained_data_name = "TT"
 
 
 def play_success_sound():
-    thread = Thread(target=winsound.PlaySound, args=["sounds/success.wav", winsound.SND_FILENAME])
+    thread = Thread(target=winsound.PlaySound, args=["resources/sounds/success.wav", winsound.SND_FILENAME])
     thread.start()
 
 
@@ -38,10 +38,10 @@ def play_failure_sound():
 
 
 def play_screenshot_sound():
-    thread = Thread(target=winsound.PlaySound, args=["sounds/screenshot.wav", winsound.SND_FILENAME])
+    thread = Thread(target=winsound.PlaySound, args=["resources/sounds/screenshot.wav", winsound.SND_FILENAME])
     thread.start()
 
 
 def play_invalid_value_sound():
-    thread = Thread(target=winsound.PlaySound, args=["sounds/invalid_value.wav", winsound.SND_FILENAME])
+    thread = Thread(target=winsound.PlaySound, args=["resources/sounds/invalid_value.wav", winsound.SND_FILENAME])
     thread.start()
