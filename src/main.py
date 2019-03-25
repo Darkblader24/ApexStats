@@ -4,11 +4,12 @@ from src.utils import *
 from src.imaging import *
 from src.file_io import *
 
+
 import pytesseract
 import time
 
 DEBUG = False
-save_all_images = False
+save_all_images = True
 
 
 def check_data(values):
@@ -76,12 +77,7 @@ def main():
 
         # Detect text from denoised screenshot
         text_ocr_stats = pytesseract.image_to_string(cln_img_stats, lang="eng").lower().replace("\n\n", "\n")
-        # TODO: add:
-        #  --oem 0 -c tessedit_char_whitelist=0123456789#
-        #  to the placement config and replace eng.traineddata with an older version (this one's corrupt)
-        #  if it works, replace --psm 13 with --psm 7
         text_ocr_placement = pytesseract.image_to_string(cln_img_placement, lang=trained_data_name, config="--psm 13 -c tessedit_char_whitelist=0123456789")
-        # text_ocr_placement = pytesseract.image_to_string(cln_img_placement, config="--psm 13 -c tessedit_char_whitelist=0123456789#")
         text_ocr_placement_alternative = pytesseract.image_to_string(cln_img_placement)
         print("---------------------------------------------------------")
         print(text_ocr_stats)
@@ -110,8 +106,8 @@ def main():
         # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
 
         # match until newline, carriage return, parenthesis or square bracket
-        kills = find_regex(r"[\n\r].*kills [{(\[]x*([^\n\r)\]}]*)",
-                           text_ocr_stats)  # TODO: Detects 190 as 180 sometimes o.o
+        # TODO: Fix (rare) detection of 190 as 180
+        kills = find_regex(r"[\n\r].*kills [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
         time_survived = find_regex(r"[\n\r].*time survived [{(\[]*([^\n\r)\]}]*)", text_ocr_stats)
@@ -120,10 +116,10 @@ def main():
         damage_done = find_regex(r"[\n\r].*damage [dcu]one [{(\[]*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        revives = find_regex(r"[\n\r].*revive al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
+        revives = find_regex(r"[\n\r].*revive a.*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        respawns = find_regex(r"[\n\r].*respawn al*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
+        respawns = find_regex(r"[\n\r].*respawn a.*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
         group_size = find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
@@ -133,14 +129,8 @@ def main():
             group_size = None
 
         # Read placement from other image
-        placement = find_better_placement_value(text_ocr_placement, text_ocr_placement_alternative).replace("#", "")
-        # clean placement some more (sometimes "#" is recognized as "4")
-        if not placement or not placement.isdigit():
-            placement = None
-        elif 41 <= int(placement) <= 49:
-            placement = str(int(placement) - 40)
-        elif 410 <= int(placement) <= 419:
-            placement = str(int(placement) - 400)
+        # placement = find_better_placement_value(text_ocr_placement, text_ocr_placement_alternative).replace("#", "")
+        placement = text_ocr_placement
 
         # order is determined by init_output_file
         data = [season, group_size, time_survived, legend, damage_done, kills, revives, respawns, placement]

@@ -63,17 +63,18 @@ def clean_image_placement(img):
     color_black = (0, 0, 0)
     color_white = (255, 255, 255)
 
-    x, y = img.size
+    width, height = img.size
     min_placement_x = 0
 
     for i, color in enumerate(img.convert("HSV").getdata()):
         h, s, v = color
         if h in range(9, 11):
             # When the first black pixel of the hashtag is found, set the minimum x value to paint pixels black a bit forward
-            if min_placement_x == 0:
-                min_placement_x = i % x + x * 0.159
+            # TODO: find out why individual pixels might fit the first criteria (and remove the hacky second criteria once fixed)
+            if min_placement_x == 0 and i % width <= 0.5 * width:
+                min_placement_x = i % width + width * 0.159
             # Paint the pixels black only if they are located after the hashtag
-            elif i % x >= min_placement_x:
+            elif i % width >= min_placement_x:
                 new_img_data.append(color_black)
             else:
                 new_img_data.append(color_white)
