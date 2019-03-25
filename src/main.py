@@ -81,7 +81,8 @@ def main():
         #  --oem 0 -c tessedit_char_whitelist=0123456789#
         #  to the placement config and replace eng.traineddata with an older version (this one's corrupt)
         #  if it works, replace --psm 13 with --psm 7
-        text_ocr_placement = pytesseract.image_to_string(cln_img_placement, config="--psm 13 -c tessedit_char_whitelist=0123456789#")
+        text_ocr_placement = pytesseract.image_to_string(cln_img_placement, lang=trained_data_name, config="--psm 13 -c tessedit_char_whitelist=0123456789")
+        # text_ocr_placement = pytesseract.image_to_string(cln_img_placement, config="--psm 13 -c tessedit_char_whitelist=0123456789#")
         text_ocr_placement_alternative = pytesseract.image_to_string(cln_img_placement)
         print("---------------------------------------------------------")
         print(text_ocr_stats)
@@ -160,11 +161,12 @@ def main():
             else:
                 print_warning("Duplicate entry")
             play_success_sound()
+        else:
+            # append_to_output(data)
+            play_invalid_value_sound()
+            print_error("Data invalid, was not written to output.")
 
-        if save_all_images or not data_correct:
-            if not data_correct:
-                play_invalid_value_sound()
-                print_error("Data invalid, was not written to output.")
+        if save_all_images:
             cln_img_stats.save(images_path + clean_stats_name)
             cln_img_placement.save(images_path + clean_placement_name)
             if not DEBUG:

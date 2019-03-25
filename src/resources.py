@@ -8,13 +8,15 @@ legends = ["bloodhound", "gibraltar", "lifeline", "pathfinder", "octane",
 
 images_path = "input/"
 
-stats_name = "stats.png"
-placement_name = "placement.png"
+stats_name = "raw_stats.png"
+placement_name = "raw_placement.png"
 clean_stats_name = "clean_stats.png"
 clean_placement_name = "clean_placement.png"
 
-test_stats_name = "stats_test.png"
-test_placement_name = "placement_test.png"
+test_stats_name = "test_stats.png"
+test_placement_name = "test_placement.png"
+
+trained_data_name = "TT"
 
 
 def play_success_sound():

@@ -58,6 +58,8 @@ def find_regex(expression, text):
         # accept only the last non-empty match (eases up writing regex)
         while not regex[-1]:
             regex = regex[:-1]
+            if not regex:
+                return None
         return clean_data(regex[-1])
     return None
 
