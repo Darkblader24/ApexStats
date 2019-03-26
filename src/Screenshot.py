@@ -6,7 +6,7 @@ import mss.tools
 from src.Color import Color
 
 
-class Screenshot(Image):
+class Screenshot:
 
     im = None
 
