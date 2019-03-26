@@ -4,6 +4,7 @@ import mss
 import mss.tools
 
 from src.Color import Color
+import pytesseract
 
 
 class Screenshot:
@@ -31,7 +32,10 @@ class Screenshot:
                 new_img_data.append(color_black)
                 continue
             new_img_data.append(color_white)
+
+        self.im = Image.new(self.im.mode, self.im.size)
+        self.im.putdata(new_img_data)
         return
 
-    def read(self):
-        return
+    def read(self, *args):
+        return pytesseract.image_to_string(self.im, *args).lower()

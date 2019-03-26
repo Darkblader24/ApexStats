@@ -23,9 +23,6 @@ output_stats_name = "Apex Stats.txt"
 trained_data_name = "TT"
 
 
-
-
-
 def play_success_sound():
     thread = Thread(target=winsound.PlaySound, args=["resources/sounds/success.wav", winsound.SND_FILENAME])
     thread.start()
