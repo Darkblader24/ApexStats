@@ -9,6 +9,7 @@ import time
 
 DEBUG = False
 save_data_with_debug = False  # if you want to save the data to the output file even though you're in debug mode
+write_data_on_error = False  # if you want to write the data to the output file despite an error
 save_all_images = True
 
 
@@ -45,6 +46,7 @@ def find_better_placement_value(placement1, placement2):
 
 
 def main():
+
     init_output_file()
 
     while True:
@@ -154,6 +156,11 @@ def main():
             else:
                 print_warning("Duplicate entry")
             play_success_sound()
+        elif write_data_on_error:
+            play_invalid_value_sound()
+            if not is_equal_to_last_entry(data) and not (DEBUG and save_data_with_debug):
+                append_to_output(data)
+            print_warning("Data invalid, written to output anyway.")
         else:
             # append_to_output(data)
             play_invalid_value_sound()
