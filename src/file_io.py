@@ -45,7 +45,7 @@ def init_output_file(filepath=output_path + output_stats_name, delim="\t"):
 
     if not os.path.isfile(filepath):
         with open(filepath, "w+") as file:
-            file.write("Initialized on: " + datetime.datetime.now().strftime("%d/%b/%Y, %H:%M:%S") + "\n")
+            file.write("\"Initialized on: " + datetime.datetime.now().strftime("%d/%b/%Y, %H:%M:%S") + "\n")
             file.write(
                 "Season" + delim + "Group-Size" + delim + "Time Survived" + delim + "Legend" + delim + "Damage" +
                 delim + "Kills" + delim + "Revives" + delim + "Respawns" + delim + "Placement\n")

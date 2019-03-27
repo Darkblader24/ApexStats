@@ -7,6 +7,7 @@ from src.file_io import *
 import pytesseract
 import time
 
+TESTING = True
 DEBUG = False
 save_data_with_debug = False  # if you want to save the data to the output file even though you're in debug mode
 write_data_on_error = False  # if you want to write the data to the output file despite an error
@@ -43,6 +44,26 @@ def find_better_placement_value(placement1, placement2):
         if is_close_match(placement2, "#" + str(i), tolerance=1):
             return placement2
     return ""
+
+
+def test_func():
+    monitor_id = 1
+    with mss.mss() as sct:
+        mon = sct.monitors[monitor_id]
+        height = mon["height"]
+        width = mon["width"]
+
+        monitor_area_1 = {
+            "top": mon["top"] + int(0.12 * height),  # X px from the top
+            "left": mon["left"] + int(0.112 * width),  # X px from the left
+            "height": int(0.324 * height),
+            "width": int(0.65 * width),
+            "mon": monitor_id,
+        }
+
+    # scrnshot = Screenshot(monitor_area_1)
+
+    # scrnshot.save("test.png")
 
 
 def main():
@@ -103,28 +124,28 @@ def main():
         # See example: https://rubular.com/r/A4j1odfYdw7TWZ
         # select all characters after "season" that until we match newline, carriage return, space or p
         # (season is followed by " played x mins ago")
-        season = find_regex(r"[\n\r].*season *([^\n\r p]*)", text_ocr_stats)
+        season = find_regex(r"[\n\r]*.*season *([^\n\r p]*)", text_ocr_stats)
 
         # Consider changing these to include erroneously recognized "revive ally", "damage done" etc.
 
         # match until newline, carriage return, parenthesis or square bracket
         # TODO: Fix (rare) detection of 190 as 180
-        kills = find_regex(r"[\n\r].*kills [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
+        kills = find_regex(r"[\n\r]*.*kills [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        time_survived = find_regex(r"[\n\r].*time survived [{(\[]*([^\n\r)\]}]*)", text_ocr_stats)
+        time_survived = find_regex(r"[\n\r]*.*time survived [{(\[]*([^\n\r)\]}]*)", text_ocr_stats)
 
         # match damage done or damage cone
-        damage_done = find_regex(r"[\n\r].*damage [dcu]one [{(\[]*([^\n\r)\]}]*)", text_ocr_stats)
+        damage_done = find_regex(r"[\n\r]*.*damage [dcu]one [{(\[]*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        revives = find_regex(r"[\n\r].*revive a.*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
+        revives = find_regex(r"[\n\r]*.*revive a.*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        respawns = find_regex(r"[\n\r].*respawn a.*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
+        respawns = find_regex(r"[\n\r]*.*respawn a.*y [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
 
         # see above
-        group_size = find_regex(r"[\n\r].*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
+        group_size = find_regex(r"[\n\r]*.*playing with friends [{(\[]x*([^\n\r)\]}]*)", text_ocr_stats)
         if group_size and group_size.isdigit():
             group_size = str(int(group_size) + 1)
         else:
