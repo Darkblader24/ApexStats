@@ -7,20 +7,18 @@ from src.Color import Color
 import pytesseract
 
 
-class Screenshot(Image):
+class Screenshot:
 
-    # im = None
+    im = None
 
     def __init__(self, monitor_area):
-        with mss.mss as sct:
+        with mss.mss() as sct:
             sct_img = sct.grab(monitor_area)
-            # self.im = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
-            tempim = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
-            self.putdata(tempim.getdata())
+            self.im = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
         return
 
-    def save(self, filepath):
-        self.im.save(filepath)
+    def save(self, fp, format="png", **params):
+        self.im.save(fp, format=format, **params)
         return
 
     def clean(self, filter_func):

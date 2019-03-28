@@ -7,7 +7,9 @@ from src.file_io import *
 import pytesseract
 import time
 
-TESTING = True
+from src.Screenshot import Screenshot
+
+TESTING = False
 DEBUG = False
 save_data_with_debug = False  # if you want to save the data to the output file even though you're in debug mode
 write_data_on_error = False  # if you want to write the data to the output file despite an error
@@ -61,12 +63,17 @@ def test_func():
             "mon": monitor_id,
         }
 
-    # scrnshot = Screenshot(monitor_area_1)
+    scrnshot = Screenshot(monitor_area_1)
 
-    # scrnshot.save("test.png")
+    scrnshot.save("../test.png")
 
 
 def main():
+
+    if TESTING:
+        test_func()
+        return 0
+
 
     init_output_file()
 
