@@ -15,7 +15,13 @@ from scipy.special import gamma
 use_last_n_games = 0
 
 # empty list to disable
-show_only_group_size = [2, 3]
+show_only_group_size = []
+show_only_legend = ["Caustic"]
+
+
+def filter_stat(filter, stats):
+    mask = [x in filter for x in stats]
+    return stats[mask]
 
 
 def main_graphs():
@@ -58,6 +64,18 @@ def main_graphs():
 
     if show_only_group_size:
         mask = [x in show_only_group_size for x in group_size]
+        season = season[mask]
+        group_size = group_size[mask]
+        seconds_survived = seconds_survived[mask]
+        legend = legend[mask]
+        damage = damage[mask]
+        kills = kills[mask]
+        revives = revives[mask]
+        respawns = respawns[mask]
+        placement = placement[mask]
+
+    if show_only_legend:
+        mask = [x in show_only_legend for x in legend]
         season = season[mask]
         group_size = group_size[mask]
         seconds_survived = seconds_survived[mask]
@@ -214,6 +232,7 @@ def main_graphs():
     percentages = np.array([counts[i] / len(win) for i in range(0, len(counts))])
 
     plt.figure(figsize=(7, 7))
+    # TODO: Fix (like above) for players who have always won or never won (i.e. dynamically change labels and explode to be of length 1 if that is the case
     plt.pie(percentages, labels=["No Win", "Win"], explode=[0.0, 0.1], autopct="%1.0f%%")
     plt.title("Win Percentage")
     plt.show()
