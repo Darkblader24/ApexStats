@@ -14,6 +14,9 @@ from scipy.special import gamma
 # 0 to disable
 use_last_n_games = 0
 
+# empty list to disable
+show_only_group_size = [2, 3]
+
 
 def main_graphs():
 
@@ -60,6 +63,18 @@ def main_graphs():
         revives = revives[-n:]
         respawns = respawns[-n:]
         placement = placement[-n:]
+
+    if show_only_group_size:
+        mask = [x in show_only_group_size for x in group_size]
+        season = season[mask]
+        group_size = group_size[mask]
+        seconds_survived = seconds_survived[mask]
+        legend = legend[mask]
+        damage = damage[mask]
+        kills = kills[mask]
+        revives = revives[mask]
+        respawns = respawns[mask]
+        placement = placement[mask]
 
 
     win = placement == 1
