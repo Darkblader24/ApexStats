@@ -3,6 +3,7 @@ from src.resources import *
 from src.utils import *
 from src.imaging import *
 from src.file_io import *
+from src.analysis import *
 
 import pytesseract
 import time
@@ -11,9 +12,12 @@ from src.Screenshot import Screenshot
 
 TESTING = False
 DEBUG = False
+
 save_data_with_debug = False  # if you want to save the data to the output file even though you're in debug mode
 write_data_on_error = False  # if you want to write the data to the output file despite an error
 save_all_images = True
+
+do_analysis = True
 
 
 def check_data(values):
@@ -74,6 +78,9 @@ def main():
         test_func()
         return 0
 
+    if do_analysis:
+        main_graphs()
+        return 0
 
     init_output_file()
 

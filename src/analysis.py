@@ -15,7 +15,7 @@ from scipy.special import gamma
 use_last_n_games = 0
 
 
-def main():
+def main_graphs():
 
     filename = "Apex Stats.txt"
     desktoppath = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
@@ -71,15 +71,15 @@ def main():
 
     groupsizelabels = None
     groupexplode = None
-    if len(solo) > 1:
+    if len(unique) > 1:
         groupsizelabels = ["Played in Group", "Played Solo"]
         groupexplode = [0.0, 0.1]
-    elif len(solo) == 1:
+    elif len(unique) == 1:
         groupexplode = [0.0]
-        if solo[0] > 1:
-            groupsizelabels = ["Played in Group"]
-        else:
+        if unique[0]:
             groupsizelabels = ["Played Solo"]
+        else:
+            groupsizelabels = ["Played in Group"]
 
 
     plt.figure(figsize=(7, 7))
@@ -237,7 +237,3 @@ def linear(x, a, b):
 
 def linear_zero(x, c):
     return c * x
-
-
-if __name__ == "__main__":
-    main()
