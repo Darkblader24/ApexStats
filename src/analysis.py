@@ -42,14 +42,6 @@ def main_graphs():
     respawns = respawns[1:].astype(int)
     placement = placement[1:].astype(int)
 
-    if len(season) <= 10:
-        print("Not enough games to evaluate!")
-        return -1
-
-    if len(season) == 0:
-        print("No games to evaluate!")
-        return -1
-
     if use_last_n_games != 0:
         if use_last_n_games > len(season):
             raise IndexError("There are a maximum of " + str(len(season)) + " Games available.")
@@ -75,6 +67,14 @@ def main_graphs():
         revives = revives[mask]
         respawns = respawns[mask]
         placement = placement[mask]
+
+    if len(season) == 0:
+        print("No games to evaluate!")
+        return -1
+
+    if len(season) <= 10:
+        print("Not enough games to evaluate!")
+        return -1
 
 
     win = placement == 1
