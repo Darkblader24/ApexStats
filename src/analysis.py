@@ -39,6 +39,14 @@ def main():
     respawns = respawns[1:].astype(int)
     placement = placement[1:].astype(int)
 
+    if len(season) <= 10:
+        print("Not enough games to evaluate!")
+        return -1
+
+    if len(season) == 0:
+        print("No games to evaluate!")
+        return -1
+
     if use_last_n_games != 0:
         if use_last_n_games > len(season):
             raise IndexError("There are a maximum of " + str(len(season)) + " Games available.")
@@ -61,8 +69,21 @@ def main():
 
     percentages = np.array([counts[i] / len(solo) for i in range(0, len(counts))])
 
+    groupsizelabels = None
+    groupexplode = None
+    if len(solo) > 1:
+        groupsizelabels = ["Played in Group", "Played Solo"]
+        groupexplode = [0.0, 0.1]
+    elif len(solo) == 1:
+        groupexplode = [0.0]
+        if solo[0] > 1:
+            groupsizelabels = ["Played in Group"]
+        else:
+            groupsizelabels = ["Played Solo"]
+
+
     plt.figure(figsize=(7, 7))
-    plt.pie(percentages, labels=["Played in Group", "Played Solo"], explode=[0.0, 0.1], autopct="%1.0f%%")
+    plt.pie(percentages, labels=groupsizelabels, explode=groupexplode, autopct="%1.0f%%")
     plt.title("Playing solo versus in a Group")
     plt.show()
 
