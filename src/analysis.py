@@ -101,20 +101,10 @@ def main_graphs():
     unique, counts = np.unique(solo, return_counts=True)
 
     groupsizelabels = None
-    groupexplode = None
-    if len(unique) > 1:
-        groupsizelabels = ["Played in Group", "Played Solo"]
-        groupexplode = [0.0, 0.1]
-    elif len(unique) == 1:
-        groupexplode = [0.0]
-        if unique[0]:
-            groupsizelabels = ["Played Solo"]
-        else:
-            groupsizelabels = ["Played in Group"]
 
 
     plt.figure(figsize=(7, 7))
-    plt.pie(counts, labels=groupsizelabels, explode=groupexplode, autopct="%1.0f%%")
+    plt.pie(counts, labels=groupsizelabels, explode=[0.1] * len(counts), autopct="%1.0f%%")
     plt.title("Playing solo versus in a Group")
     plt.show()
 
@@ -124,7 +114,7 @@ def main_graphs():
         pt = seconds_survived[mask]
         playtimes[l] = sum(pt)
 
-    print("Survival Times:")
+    print("Total Survival Times:")
     for key, value in playtimes.items():
         if len(key) < 7:
             print("{value1:s}:\t\t{value2:.0f}".format(value1=key, value2=value))
@@ -134,14 +124,14 @@ def main_graphs():
 
 
     plt.figure(figsize=(7, 7))
-    plt.pie(playtimes.values(), labels=playtimes.keys(), explode=[0.0] + [0.1] * (len(playtimes.keys()) - 1), autopct="%1.0f%%")
+    plt.pie(playtimes.values(), labels=playtimes.keys(), explode=[0.1] * len(playtimes.values()), autopct="%1.0f%%")
     plt.title("Playtime by Legend")
     plt.show()
 
     unique, counts = np.unique(legend, return_counts=True)
 
     plt.figure(figsize=(7, 7))
-    plt.pie(counts, labels=unique, explode=[0.0] + [0.1] * (len(unique) - 1), autopct="%1.0f%%")
+    plt.pie(counts, labels=unique, explode=[0.1] * len(counts), autopct="%1.0f%%")
     plt.title("Number of Games Played by Legend")
     plt.show()
 
@@ -245,11 +235,8 @@ def main_graphs():
 
     unique, counts = np.unique(win, return_counts=True)
 
-    percentages = np.array([counts[i] / len(win) for i in range(0, len(counts))])
-
     plt.figure(figsize=(7, 7))
-    # TODO: Fix (like above) for players who have always won or never won (i.e. dynamically change labels and explode to be of length 1 if that is the case
-    plt.pie(percentages, labels=["No Win", "Win"], explode=[0.0, 0.1], autopct="%1.0f%%")
+    plt.pie(counts, labels=["No Win", "Win"], explode=[0.1] * len(counts), autopct="%1.0f%%")
     plt.title("Win Percentage")
     plt.show()
 
