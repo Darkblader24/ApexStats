@@ -12,7 +12,7 @@ from scipy.optimize import curve_fit
 from scipy.special import gamma
 
 # 0 to disable
-use_last_n_games = 0
+use_last_n_games = 50
 
 # empty list to disable
 show_only_group_size = []
@@ -100,7 +100,12 @@ def main_graphs():
 
     unique, counts = np.unique(solo, return_counts=True)
 
-    groupsizelabels = None
+    groupsizelabels = []
+    for played_solo in unique:
+        if played_solo:
+            groupsizelabels.append("Solo")
+        else:
+            groupsizelabels.append("Group")
 
 
     plt.figure(figsize=(7, 7))
