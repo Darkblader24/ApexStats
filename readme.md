@@ -12,6 +12,7 @@ keep track of all match statistics you acquire this way in a separate text file 
 
 ### Recommended Specs ###
 Aspect Ratio: 16:9
+
 Monitor Resolution: 1920x1080 or higher
 
 This is recommended for the OCR to work properly.
